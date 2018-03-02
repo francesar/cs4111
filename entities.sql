@@ -4,9 +4,10 @@ CREATE TABLE Users (
     username VARCHAR(60),
     password VARCHAR(60),
     email TEXT,
-    zipcode INTEGER NOT NULL
+    zipcode VARCHAR(5) NOT NULL
     FOREIGN KEY(zipcode) REFERENCES Zipcode
     PRIMARY KEY(uid)
+    CHECK (char_length(zipcode) == 5)
 );
 
 CREATE TABLE Representative (
@@ -29,10 +30,11 @@ CREATE TABLE Home (
 );
 
 CREATE TABLE Zipcode (
-    zipcode INTEGER,
+    zipcode VARCHAR(5) NOT NULL,
     county TEXT,
     city_name TEXT
     PRIMARY KEY(zipcode)
+    CHECK (char_length(zipcode) == 5)
 );
 
 CREATE TABLE Score (
@@ -48,6 +50,7 @@ CREATE TABLE MoneyValue (
     hid INTEGER,
     FOREIGN KEY(hid) REFERENCES Home,
     PRIMARY KEY(hid)
+    CHECK (amount > 0 AND year > 1970)
 );
 
 CREATE TABLE Topics (
@@ -60,20 +63,9 @@ CREATE TABLE Topics (
 CREATE TABLE Comments (
     comment TEXT,
     cid INTEGER NOT NULL,
-    crid INTEGER NOT NULL,
     tid INTEGER NOT NULL,
     comid INTEGER NOT NULL,
     FOREIGN KEY(cid) REFERENCES Citizen ON DELETE CASCADE,
-    FOREIGN KEY(crid) REFERENCES Critique ON DELETE CASCADE,
     FOREIGN KEY(tid) REFERENCES Topic ON DELETE CASCADE,
     PRIMARY KEY(comid)
-);
-
-CREATE TABLE Critique (
-    total_pos INTEGER,
-    total_neg INTEGER,
-    crid INTEGER
-    FOREIGN KEY(hid) REFERENCES Score,
-    FOREIGN KEY(comid) REFERENCES Comments,
-    PRIMARY KEY(crid)
 );
