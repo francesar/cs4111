@@ -1,28 +1,31 @@
-
 CREATE TABLE Users (
     uid INTEGER,
     name VARCHAR(60),
     username VARCHAR(60),
     password VARCHAR(60),
     email TEXT,
+    zipcode INTEGER NOT NULL
+    FOREIGN KEY(zipcode) REFERENCES Zipcode
     PRIMARY KEY(uid)
 );
 
 CREATE TABLE Representative (
-    uid INTEGER,
+    uid INTEGER NOT NULL,
     phone_number VARCHAR(60),
-    zipcode INTEGER NOT NULL,
-    FOREIGN KEY(zipcode) REFERENCES Zipcode,
     FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
-    PRIMARY KEY(uid),
 );
 
 CREATE TABLE Citizen (
-    uid INTEGER,
-    zipcode INTEGER NOT NULL,
+    uid INTEGER NOT NULL,
+    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE
+);
+
+CREATE TABLE Home (
+    hid INTEGER,
+    score INTEGER,
+    zipcode INTEGER NOT NULL, 
     FOREIGN KEY(zipcode) REFERENCES Zipcode,
-    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
-    PRIMARY KEY(uid)
+    PRIMARY KEY(hid, zipcode)
 );
 
 CREATE TABLE Zipcode (
@@ -32,16 +35,9 @@ CREATE TABLE Zipcode (
     PRIMARY KEY(zipcode)
 );
 
-CREATE TABLE Home (
-    hid INTEGER,
-    zipcode INTEGER, 
-    FOREIGN KEY(zipcode) REFERENCES Zipcode,
-    PRIMARY KEY(hid)
-);
-
 CREATE TABLE Score (
     amount INTEGER, 
-    hid INTEGER,
+    hid INTEGER NOT NULL,
     FOREIGN KEY(hid) REFERENCES Home,
     PRIMARY KEY(hid)
 );
@@ -63,10 +59,10 @@ CREATE TABLE Topics (
 
 CREATE TABLE Comments (
     comment TEXT,
-    cid INTEGER,
-    crid INTEGER,
-    tid INTEGER,
-    comid INTEGER,
+    cid INTEGER NOT NULL,
+    crid INTEGER NOT NULL,
+    tid INTEGER NOT NULL,
+    comid INTEGER NOT NULL,
     FOREIGN KEY(cid) REFERENCES Citizen ON DELETE CASCADE,
     FOREIGN KEY(crid) REFERENCES Critique ON DELETE CASCADE,
     FOREIGN KEY(tid) REFERENCES Topic ON DELETE CASCADE,
