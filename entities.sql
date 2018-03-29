@@ -8,7 +8,8 @@ CREATE TABLE Users (
     hid INTEGER NOT NULL,
     FOREIGN KEY(zipcode) REFERENCES Zipcodes,
     FOREIGN KEY(hid) REFERENCES Home,
-    PRIMARY KEY(uid)
+    PRIMARY KEY(uid),
+    CHECK (char_length(zipcode) == 5)
 );
 
 CREATE TABLE Representatives (
@@ -40,6 +41,7 @@ CREATE TABLE Zipcodes (
     CONSTRAINT valid_home_price CHECK(avg_zillow_price > 0),
     CONSTRAINT valid_zip_length CHECK(char_length(zipcode) = 5),
     PRIMARY KEY(zipcode)
+    CHECK (char_length(zipcode) == 5)
 );
 
 CREATE TABLE Topics (
