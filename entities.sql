@@ -3,51 +3,43 @@ CREATE TABLE Users (
     name VARCHAR(60),
     username VARCHAR(60),
     password VARCHAR(60),
-    email TEXT,
-    zipcode INTEGER NOT NULL
-    FOREIGN KEY(zipcode) REFERENCES Zipcode
+    email VARCHAR(60),
+    zipcode VARCHAR(5) NOT NULL,
+    hid INTEGER NOT NULL,
+    FOREIGN KEY(zipcode) REFERENCES Zipcodes,
+    FOREIGN KEY(hid) REFERENCES Home,
     PRIMARY KEY(uid)
 );
 
-CREATE TABLE Representative (
+CREATE TABLE Representatives (
     uid INTEGER NOT NULL,
     phone_number VARCHAR(60),
-    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
+    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE
 );
 
-CREATE TABLE Citizen (
+CREATE TABLE Citizens (
     uid INTEGER NOT NULL,
     FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE
 );
 
-CREATE TABLE Home (
+CREATE TABLE Homes (
     hid INTEGER,
     score INTEGER,
-    zipcode INTEGER NOT NULL, 
-    FOREIGN KEY(zipcode) REFERENCES Zipcode,
-    PRIMARY KEY(hid, zipcode)
+    zipcode VARCHAR(5) NOT NULL,
+    value INTEGER NOT NULL,
+    CONSTRAINT valid_home_price CHECK(value > 0),
+    FOREIGN KEY(zipcode) REFERENCES Zipcodes,
+    PRIMARY KEY(hid)
 );
 
-CREATE TABLE Zipcode (
-    zipcode INTEGER,
+CREATE TABLE Zipcodes (
+    zipcode VARCHAR(5),
     county TEXT,
-    city_name TEXT
+    city_name TEXT,
+    avg_zillow_price INTEGER,
+    CONSTRAINT valid_home_price CHECK(avg_zillow_price > 0),
+    CONSTRAINT valid_zip_length CHECK(char_length(zipcode) = 5),
     PRIMARY KEY(zipcode)
-);
-
-CREATE TABLE Score (
-    amount INTEGER, 
-    hid INTEGER NOT NULL,
-    FOREIGN KEY(hid) REFERENCES Home,
-    PRIMARY KEY(hid)
-);
-
-CREATE TABLE MoneyValue (
-    year INTEGER,
-    amount INTEGER,
-    hid INTEGER,
-    FOREIGN KEY(hid) REFERENCES Home,
-    PRIMARY KEY(hid)
 );
 
 CREATE TABLE Topics (
@@ -59,21 +51,33 @@ CREATE TABLE Topics (
 
 CREATE TABLE Comments (
     comment TEXT,
-    cid INTEGER NOT NULL,
-    crid INTEGER NOT NULL,
-    tid INTEGER NOT NULL,
-    comid INTEGER NOT NULL,
-    FOREIGN KEY(cid) REFERENCES Citizen ON DELETE CASCADE,
-    FOREIGN KEY(crid) REFERENCES Critique ON DELETE CASCADE,
-    FOREIGN KEY(tid) REFERENCES Topic ON DELETE CASCADE,
-    PRIMARY KEY(comid)
+    uid INTEGER NOT NULL,
+    topic_id INTEGER NOT NULL,
+    comment_id INTEGER NOT NULL,
+    sentiment INTEGER NOT NULL,
+    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
+    FOREIGN KEY(topic_id) REFERENCES Topics ON DELETE CASCADE,
+    PRIMARY KEY(comment_id)
 );
 
-CREATE TABLE Critique (
-    total_pos INTEGER,
-    total_neg INTEGER,
-    crid INTEGER
-    FOREIGN KEY(hid) REFERENCES Score,
-    FOREIGN KEY(comid) REFERENCES Comments,
-    PRIMARY KEY(crid)
+CREATE TABLE Votes (
+    vote_id INTEGER,
+    val INTEGER,
+    comment_id INTEGER,
+    uid INTEGER,
+    FOREIGN KEY(comment_id) REFERENCES Comments,
+    FOREIGN KEY(uid) REFERENCES Users,
+    PRIMARY KEY(vote_id)
 );
+
+SELECT AVG(H.value)
+FROM homes H
+WHERE H.zipcode = '60651';
+
+SELECT U.zipcode, COUNT(U.name) as AmountOfReps
+FROM users U NATURAL JOIN representatives R 
+GROUP BY U.zipcode
+
+SELECT C.topic_id, COUNT(*) 
+FROM comments C NATURAL JOIN users U 
+GROUP BY C.topic_id;
