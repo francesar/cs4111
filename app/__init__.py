@@ -122,7 +122,6 @@ def signup():
   phonenumber = form['phonenumber']
   party = form['party']
 
-  
   q = text("""INSERT INTO users(uid, name, username, password, email, zipcode, hid)
     VALUES(:uid, :name, :username, :password, :email, :zipcode, :hid)""")
   g.conn.execute(q, uid=12234, name=name, 
@@ -146,19 +145,14 @@ def login():
     return redirect('/home')
   else:
     return redirect('/')
-  
 
-#
-# This is an example of a different path.  You can see it at:
-# 
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#
-@app.route('/another')
-def another():
-  return render_template("another.html")
+@app.route('/feed')
+def feed():
+  cursor = g.conn.execute("SELECT * FROM comments")
+  for result in cursor:
+    print(result)  # can also be accessed using result[0]
+  cursor.close()
+  return render_template("feed.html")
 
 
 # Example of adding new data to the database
