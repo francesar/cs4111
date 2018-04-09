@@ -13,10 +13,13 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask_login import LoginManager
-from flask import Flask, request, render_template, g, redirect, Response
+from flask import Flask, request, render_template, g, redirect, Response, flash
+
+from .forms.login import LoginForm
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
+app.config['SECRET_KEY'] = "key"
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -98,12 +101,14 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT * FROM users")
-  names = []
-  for result in cursor:
-    print(result)  # can also be accessed using result[0]
-  cursor.close()
-  return render_template("index.html")
+  # cursor = g.conn.execute("SELECT * FROM users")
+  # names = []
+  # for result in cursor:
+  #   print(result)  # can also be accessed using result[0]
+  # cursor.close()
+
+
+  return render_template("index.html", form=LoginForm())
 
 @app.route('/home')
 def home():
@@ -132,18 +137,25 @@ def signup():
 
 @app.route('/login', methods=["POST"])
 def login():
-  username = request.form['username']
-  password = request.form['password']
+  form = LoginForm()
+  if form.validate_on_submit():
+    username = form['username'].data
+    password = form['password'].data
 
-  q = text("SELECT * FROM users U WHERE username = :username AND password = :password")
-  cursor = g.conn.execute(q, username=username, password=password)
+    q = text("SELECT * FROM users U WHERE username = :username AND password = :password")
+    cursor = g.conn.execute(q, username=username, password=password)
 
-  print(cursor.returns_rows)
-
-  if cursor.returns_rows:
-    print(cursor)
-    return redirect('/home')
+    row = cursor.first()
+    if row:
+      return redirect('/home')
+    else:
+      flash('Username or password incorrect')
+      return redirect('/')
   else:
+    errs = []
+    for error in form.errors.items():
+      errs.append("{}: {}".format(error[1][0], error[0]))
+    flash(errs)
     return redirect('/')
 
 @app.route('/feed')
