@@ -1,69 +1,29 @@
-
-"""
-Columbia's COMS W4111.001 Introduction to Databases
-Example Webserver
-To run locally:
-    python server.py
-Go to http://localhost:8111 in your browser.
-A debugger such as "pdb" may be helpful for debugging.
-Read about it online.
-"""
 import os
-  # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask_login import LoginManager
-from flask import Flask, request, render_template, g, redirect, Response, flash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask import Flask, request, render_template, g, redirect, Response, flash, session, jsonify
 
 from .forms.login import LoginForm
+
+from .models.user import Representative, Citizen
+from .models.comment import Comment
+
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 app.config['SECRET_KEY'] = "key"
 
 login_manager = LoginManager()
-login_manager.init_app(app)
+# login_manager.init_app(app)
 
-
-#
-# The following is a dummy URI that does not connect to a valid database. You will need to modify it to connect to your Part 2 database in order to use the data.
-#
-# XXX: The URI should be in the format of: 
-#
-#     postgresql://USER:PASSWORD@35.227.79.146/proj1part2
-#
-# For example, if you had username gravano and password foobar, then the following line would be:
-#
-#     DATABASEURI = "postgresql://gravano:foobar@35.227.79.146/proj1part2"
-#
 DATABASEURI = "postgresql://cfi2103:6814@35.227.79.146/proj1part2"
-
-
-#
-# This line creates a database engine that knows how to connect to the URI above.
-#
 engine = create_engine(DATABASEURI)
 
-#
-# Example of running queries in your database
-# Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
-#
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
-  id serial,
-  name text
-);""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
-
+cache = {}
 
 @app.before_request
 def before_request():
-  """
-  This function is run at the beginning of every web request 
-  (every time you enter an address in the web browser).
-  We use it to setup a database connection that can be used throughout the request.
-
-  The variable g is globally accessible.
-  """
   try:
     g.conn = engine.connect()
   except:
@@ -73,46 +33,49 @@ def before_request():
 
 @app.teardown_request
 def teardown_request(exception):
-  """
-  At the end of the web request, this makes sure to close the database connection.
-  If you don't, the database could run out of memory!
-  """
   try:
     g.conn.close()
   except Exception as e:
+    print(e)
     pass
 
-
-#
-# @app.route is a decorator around index() that means:
-#   run index() whenever the user tries to access the "/" path using a GET request
-#
-# If you wanted the user to go to, for example, localhost:8111/foobar/ with POST or GET then you could use:
-#
-#       @app.route("/foobar/", methods=["POST", "GET"])
-#
-# PROTIP: (the trailing / in the path is important)
-# 
-# see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
-# see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
-#
 @app.route('/')
 def index():
-  #
-  # example of a database query
-  #
-  # cursor = g.conn.execute("SELECT * FROM users")
-  # names = []
-  # for result in cursor:
-  #   print(result)  # can also be accessed using result[0]
-  # cursor.close()
-
-
   return render_template("index.html", form=LoginForm())
+
+@app.route('/map')
+def map():
+  return render_template("map.html")
 
 @app.route('/home')
 def home():
-  return render_template('home.html')
+  if 'uid' in session:
+    print(session)
+    return render_template('home.html')
+  else:
+    return redirect('/')
+
+@app.route('/comments', methods=["POST"])
+def comments():
+  req = request.get_json()
+  zipcode = req['zipcode']
+
+  print(zipcode)
+
+  query = text("SELECT * FROM Comments")
+  cursor = g.conn.execute(query)
+  comments = []
+  for result in cursor:
+    comment = Comment(comment=result['comment'], uid=result['uid'],
+    topic_id=result['topic_id'], comment_id=result['comment_id'], 
+    sentiment=result['sentiment'])
+    comments.append(Comment.toDict(comment))
+  
+  return jsonify(comments)
+
+@app.route('/profile')
+def profile():
+  return 'profile'
 
 @app.route('/signup', methods=["POST"])
 def signup():
@@ -147,6 +110,11 @@ def login():
 
     row = cursor.first()
     if row:
+      user = Citizen(username=row.username, uid=row.uid, name=row.name,
+      email=row.email, zipcode=row.zipcode, hid=row.hid)
+
+      session['username'] = user.username
+      session['uid'] = user.uid
       return redirect('/home')
     else:
       flash('Username or password incorrect')
@@ -165,16 +133,6 @@ def feed():
     print(result)  # can also be accessed using result[0]
   cursor.close()
   return render_template("feed.html")
-
-
-# Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  return redirect('/')
-
-
 
 if __name__ == "__main__":
   import click
