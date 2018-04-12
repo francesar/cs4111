@@ -17,20 +17,6 @@
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
     <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
-    <ul class="nav justify-content-end">
-      <li class="nav-item active">
-        <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="{{url_for('houseinfo')}}">Home Info</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
-      </li>
-      <li>
-        <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
-      </li>
-    </ul>
   </nav>
 
   {% with messages = get_flashed_messages() %} {% if messages %}
@@ -144,8 +130,12 @@
             <p>We book keep this sentiment score for your local representatives to see, and to help them make educated policy
               decisions that will hopefully make you love your neighborhood more!</p>
             <div>
-              <lable>Hello</lable>
-              <input name="ans1">
+              <lable>Do you feel safe in your neighborhood</lable>
+              <input placeholder="1-10" name="safe">
+              <label>Do you feel like there is enough places to get healthy food?</label>
+              <input placeholder="1-10" name="food">
+              <label>Overall, how happy would you say you are?</label>
+              <input placeholder="1-10" name="happy">
             </div>
           </div>
           <button id="submit" class="btn btn-primary">Submit</button>

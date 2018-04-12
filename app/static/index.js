@@ -6,5 +6,3 @@ function toggleRepresentativeSignUp() {
   $('#representativeLoginForm').modal('show');
 }
 
-
-

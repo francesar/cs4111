@@ -48,7 +48,16 @@ def index():
 
 @app.route('/u/<uid>')
 def user(uid):
-  return 'user'
+  cursor = g.conn.execute(text("SELECT * FROM users WHERE uid = :uid LIMIT 1"), uid=uid)
+  user = {}
+  for result in cursor:
+    user['name'] = result['name']
+    user['username'] = result['username']
+    user['email'] = result['email']
+    user['address'] = result['address']
+    user['party_affiliation'] = result['party_affiliation']
+
+  return render_template('u.html', user=user)
 
 @app.route('/map')
 def map():
@@ -416,7 +425,11 @@ def citizenSignUp():
   home_id = uuid.uuid4()
   party = "Democrat"
 
-  score = 10
+  safe = int(data['safe'])
+  food = int(data['food'])
+  happy = int(data['happy'])
+
+  score = (safe + food + happy) / 3
 
   g.conn.execute(text("""
     INSERT INTO zipcodes (zipcode, avg_price)
