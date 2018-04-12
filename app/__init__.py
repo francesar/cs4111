@@ -162,8 +162,9 @@ def feedcomments():
         FROM Users U, Comments C, Topics T, Votes V
         WHERE U.uid = C.uid 
           AND T.tid = C.topic_id
+          AND V.comment_id = C.comment_id
           AND C.zipcode LIKE '%:zipcode%'
-        GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid""")
+        GROUP BY C.comment_id, V.val, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid""")
 
     cursor = g.conn.execute(og_query, zipcode=intzip)
     comments = []
@@ -215,7 +216,7 @@ def feedcomments():
       AND V.comment_id = C.comment_id
       AND C.topic_id = T.tid
       AND V.val <= :maxvotes
-      GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid, V.val""")
+      GROUP BY C.comment_id,C.topic_id, T.topic_name, U.username, U.zipcode, U.uid, V.val""")
 
     cursor = g.conn.execute(og_query, maxvotes=maxvotes)
     comments = []
