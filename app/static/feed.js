@@ -11,7 +11,7 @@ createFeedCommentHTML = c => {
   let cardTopic = $('<h6 class="card-topic"></h6>')
   let cardVotes = $('<h6 class="card-location"></h6>')
   let cardSentiment = $('<h6 class="card-location"></h6>')
-  let voting = $('<div class="input-group"><div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Upvote</button><button class="btn btn-outline-secondary" type="button">Downvote</button></div></div>')
+  let voting = $('<form id="voting" action="/voting" method="POST"><div class="input-group"><div class="input-group-append"><button id="up" class="btn btn-outline-secondary" type="button">Like</button><button class="btn btn-outline-secondary" id="down" type="button">Dislike</button></div></div></form>')
   
   cardAuthor.text(c.username)
   cardLocation.text(c.zipcode)
@@ -65,12 +65,18 @@ updateFeedComments = (filterType, filterQuery) => {
     })
 }
 
+createFeedHeaderHTML = (filterType, filterQuery) => {
+  console.log("creating header");
+  let body = $('<div></div>');
+  let header = $('<h3></h3>');
+  header.text("Comments relating to... " + filterType + " of " + filterQuery);
+}
+
 updateFeedView = (filter) => {
   filterType = filter.id;
-  console.log(filterType)
   const input = document.getElementById(filter.id);
   const filterQuery = input.value;
-  console.log("update filter view: " + filterType);
-  updateFeedComments(filterType, filterQuery);
 
+  createFeedHeaderHTML(filterType, filterQuery);
+  updateFeedComments(filterType, filterQuery);
 }

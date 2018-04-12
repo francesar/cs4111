@@ -146,6 +146,7 @@ def comments():
 @app.route('/feedcomments', methods=["POST"])
 def feedcomments():
   req = request.get_json()
+  print(req)
   filterType = req['filterType']
   filterQuery = req['filterQuery']
   print(filterType)
@@ -161,7 +162,6 @@ def feedcomments():
         FROM Users U, Comments C, Topics T, Votes V
         WHERE U.uid = C.uid 
           AND T.tid = C.topic_id
-          AND V.comment_id = C.comment_id
           AND C.zipcode LIKE '%:zipcode%'
         GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid""")
 
@@ -173,7 +173,7 @@ def feedcomments():
       topic_id=result['topic_id'], comment_id=result['comment_id'], 
       sentiment=result['sentiment'], 
       topic_name=result['topic_name'], username=result['username'], 
-      vote_count=result['vote_count'], zipcode=intzip)
+      vote_count=result['vote_count'], zipcode=result['zipcode'])
       comments.append(Comment.toDict(comment))
     return jsonify(comments)
 
@@ -200,7 +200,7 @@ def feedcomments():
       topic_id=result['topic_id'], comment_id=result['comment_id'], 
       sentiment=result['sentiment'], 
       topic_name=result['topic_name'], username=result['username'], 
-      vote_count=result['vote_count'], zipcode=['zipcode'])
+      vote_count=result['vote_count'], zipcode=result['zipcode'])
       comments.append(Comment.toDict(comment))
     return jsonify(comments)
 
@@ -225,7 +225,7 @@ def feedcomments():
       topic_id=result['topic_id'], comment_id=result['comment_id'], 
       sentiment=result['sentiment'], 
       topic_name=result['topic_name'], username=result['username'], 
-      vote_count=result['vote_count'], zipcode=['zipcode'])
+      vote_count=result['vote_count'], zipcode=result['zipcode'])
       comments.append(Comment.toDict(comment))
     return jsonify(comments)
 
@@ -250,7 +250,7 @@ def feedcomments():
       topic_id=result['topic_id'], comment_id=result['comment_id'], 
       sentiment=result['sentiment'], 
       topic_name=result['topic_name'], username=result['username'], 
-      vote_count=result['vote_count'], zipcode=['zipcode'])
+      vote_count=result['vote_count'], zipcode=result['zipcode'])
       comments.append(Comment.toDict(comment))
     return jsonify(comments)
 
@@ -278,7 +278,7 @@ def feedcomments():
       topic_id=result['topic_id'], comment_id=result['comment_id'], 
       sentiment=result['sentiment'], 
       topic_name=result['topic_name'], username=result['username'], 
-      vote_count=result['vote_count'], zipcode=['zipcode'])
+      vote_count=result['vote_count'], zipcode=result['zipcode'])
       comments.append(Comment.toDict(comment))
     return jsonify(comments)
 
@@ -304,20 +304,31 @@ def newcomment():
 
   comment = form['comment']
   sentiment = form['sentiment']
-  topic_name = form['topic']
+  topic_id = form['topic']
   date_posted = datetime.now()
   comment_id = uuid.uuid4()
+  vote_id = uuid.uuid4()
 
+  print(session)
   if 'uid' in session:
     current_user_uid = session['uid']
-    #current_user_zipcode = session['zipcode']
     uid = current_user_uid
-    zipcode = "10027" #current_user_zipcode
+    print("UID")
+    print(uid)
+
+    zq = text("""SELECT U.zipcode FROM Users U WHERE U.uid = :uid;""")
+    zcursor = g.conn.execute(zq, uid=uid)
+    for zresult in zcursor:
+      zipcode = zresult[0]
+      print("ZIPCODE" + zipcode)
+
+    aq = text("""SELECT U.address FROM Users U WHERE U.uid = :uid;""")
+    acursor = g.conn.execute(aq, uid=uid)
+    for aresult in acursor:
+      address = aresult[0]
+    print(address)
   else:
     print("not a user")
-  
-
-  topic_id = form['topic']
 
   # Inserting comment
   q = text("""INSERT INTO comments(comment, uid, topic_id, comment_id, sentiment, zipcode,
@@ -328,6 +339,16 @@ def newcomment():
   g.conn.execute(q, comment=comment, uid=uid, topic_id=topic_id, 
     comment_id=comment_id, sentiment=sentiment, zipcode=zipcode, date_posted=date_posted)
 
+  vq = text("""INSERT INTO votes(vote_id, val, comment_id, uid)
+    VALUES(:vote_id, :val, :comment_id, :uid)""") 
+  g.conn.execute(vq, vote_id=vote_id, val=1, comment_id=comment_id, uid=uid) 
+  return redirect('/feed')
+
+@app.route('/voting', methods=["POST"])
+def voting():
+  # form = request.form
+  # up = request['up']
+  print("VOTED")
   return redirect('/feed')
 
 @app.route('/citizenSignUp', methods=["POST"])
