@@ -11,7 +11,7 @@ createFeedCommentHTML = c => {
   let cardTopic = $('<h6 class="card-topic"></h6>')
   let cardVotes = $('<h6 class="card-location"></h6>')
   let cardSentiment = $('<h6 class="card-location"></h6>')
-  let voting = $('<form id="voting" action="/voting" method="POST"><div class="input-group"><div class="input-group-append"><button id="up" class="btn btn-outline-secondary" type="button">Like</button><button class="btn btn-outline-secondary" id="down" type="button">Dislike</button></div></div></form>')
+  let voting = $('<form id="voting" action="/voting" method="POST"><div class="input-group"><div class="input-group-append"><button id="up" class="btn btn-outline-secondary" type="button" style="color:green;">Agree</button><button class="btn btn-outline-secondary" id="down" type="button" style="color:red;">Disagree</button></div></div></form>')
   
   cardAuthor.text(c.username)
   cardLocation.text(c.zipcode)
