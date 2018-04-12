@@ -8,28 +8,41 @@ createFeedCommentHTML = c => {
   let cardTimestamp = $('<h6 class="card-timestamp"></h6>')
   let cardText = $('<p class="card-text"></p>')
   let cardTopic = $('<h6 class="card-topic"></h6>')
+  let cardVotes = $('<h6 class="card-location"></h6>')
+  let cardSentiment = $('<h6 class="card-location"></h6>')
 
-  cardAuthor.text(c.uid)
-  cardLocation.text("10027")
-  cardTimestamp.text("4/9/2018")
-  cardText.text(c.comment)
-  cardTopic.text(c.topic_id)
+  cardAuthor.text(c.username)
+  cardLocation.text(c.zipcode)
+  cardTimestamp.text(c.date_posted)
+  cardText.text(" \"" + c.comment + "\" ")
+  cardTopic.text("Topic: " + c.topic_name)
 
-  // if (c.sentiment === 1) {
-  //   cardSubtitle.text("Bad")
-  //   cardSubtitle.css({'color': 'red'})
-  // } else {
-  //   cardSubtitle.text("Good")
-  //   cardSubtitle.css({'color': 'green'})
-  // }
+  if (c.sentiment === 1) {
+    cardSentiment.text("Bad")
+    cardSentiment.css({'color': 'red'})
+  } else {
+    cardSentiment.text("Good")
+    cardSentiment.css({'color': 'green'})
+  }
+
+  if (c.vote_count > 0) {
+    cardVotes.text(c.vote_count + " upvotes")
+    cardVotes.css({'color': 'green'})
+  } else if (c.vote_count > 0) {
+    cardVotes.text(c.vote_count + " downvotes")
+    cardVotes.css({'color': 'red'})
+  } else {
+    cardVotes.text(c.vote_count + " votes")
+  }
   console.log(c.name)
-  console.log("bitch")
 
   cardBody = cardBody.append(cardAuthor);
   cardBody = cardBody.append(cardLocation);
   cardBody = cardBody.append(cardTimestamp);
   cardBody = cardBody.append(cardText);
   cardBody = cardBody.append(cardTopic);
+  cardBody = cardBody.append(cardVotes);
+
   card = card.append(cardBody);
 
 
@@ -37,6 +50,8 @@ createFeedCommentHTML = c => {
 }
 
 updateFeedComments = (zipcode) => {
+  console.log("update feed comments " + zipcode)
+
   axios.post('/feedcomments', {zipcode})
     .then(resp => {
         resp.data.map(comment => {
@@ -49,17 +64,18 @@ updateFeedComments = (zipcode) => {
 updateFeedView = () => {
   const input = document.getElementById('zipcode')
   const zipcode = input.value
-  
+  console.log("update feed view " + zipcode)
+
   updateFeedComments(zipcode);
 }
 
-addComment = () => {
-  console.log("new comment")
+// addComment = () => {
+//   console.log("new comment")
 
-  axios.post('/newcomment')
-  .then(resp => {
-      resp.data.map(comment => {
-      console.log("posttt");
-    })
-  })
-}
+//   axios.post('/newcomment')
+  // .then(resp => {
+  //     resp.data.map(comment => {
+  //     console.log("posttt");
+  //   })
+  // })
+// }

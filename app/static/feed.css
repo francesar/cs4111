@@ -14,8 +14,8 @@
     margin-bottom: 20px;
     margin-left: 15px;
 }
-.card-timestamp{
-    float: right;
+.card-topic{
+    color: #6e7376;
 }
 
 .row {
@@ -23,7 +23,7 @@
 }
 
 .form {
-    display: flex;
+    /*display: flex;*/
     justify-content: space-between;
     flex-direction: row;
 }

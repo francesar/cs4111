@@ -5,6 +5,7 @@ from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import Flask, request, render_template, g, redirect, Response, flash, session, jsonify
+from datetime import datetime, date, time
 
 from .forms.login import LoginForm
 
@@ -109,11 +110,10 @@ def home():
 def comments():
   req = request.get_json()
   zipcode = req['zipcode']
-<<<<<<< HEAD
 
   comments_q = text("""
     SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
-      C.sentiment, T.topic_name, U.username, U.zipcode,
+      C.sentiment, C.date_posted, T.topic_name, U.username, U.zipcode,
       SUM(V.val) as vote_count
     FROM Users U, Comments C, Topics T, Votes V
     WHERE U.uid = C.uid 
@@ -121,24 +121,18 @@ def comments():
       AND T.tid = C.topic_id
       AND V.comment_id = C.comment_id
     GROUP BY C.comment_id, C.comment, C.uid, C.topic_id, C.uid, C.sentiment, 
-      T.topic_name, U.username, U.zipcode""")
+      C.date_posted, T.topic_name, U.username, U.zipcode""")
 
   cursor = g.conn.execute(comments_q, zipcode=zipcode)
-=======
-  print(zipcode)
-
-  query = text("SELECT * FROM Comments")
-  cursor = g.conn.execute(query)
->>>>>>> 1eee4ec3aab026d8e30abf23c4ae25cc57363f70
   comments = []
 
   for result in cursor:
     print(result, 'HELLO')
     comment = Comment(comment=result['comment'], uid=result['uid'],
     topic_id=result['topic_id'], comment_id=result['comment_id'], 
-    sentiment=result['sentiment'], topic_name=result['topic_name'], 
-    username=result['username'], vote_count=result['vote_count'],
-    zipcode=zipcode)
+    sentiment=result['sentiment'], date_posted=result['date_posted'], 
+    topic_name=result['topic_name'], username=result['username'], 
+    vote_count=result['vote_count'], zipcode=zipcode)
     comments.append(Comment.toDict(comment))
 
   print(comments)
@@ -151,13 +145,27 @@ def feedcomments():
   zipcode = req['zipcode']
   print(zipcode)
 
-  query = text("SELECT * FROM Comments")
-  cursor = g.conn.execute(query)
+  og_query = text("""
+    SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
+      C.sentiment, C.date_posted, T.topic_name, U.username, U.zipcode,
+      SUM(V.val) as vote_count
+    FROM Users U, Comments C, Topics T, Votes V
+    WHERE U.uid = C.uid 
+      AND U.zipcode = :zipcode 
+      AND T.tid = C.topic_id
+      AND V.comment_id = C.comment_id
+    GROUP BY C.comment_id, C.comment, C.uid, C.topic_id, C.uid, C.sentiment, 
+      C.date_posted, T.topic_name, U.username, U.zipcode""")
+
+  cursor = g.conn.execute(og_query, zipcode=zipcode)
   comments = []
   for result in cursor:
-    comment = Comment(comment=result['comment'], uid=result['uid'], 
+    print(result, '!!!')
+    comment = Comment(comment=result['comment'], uid=result['uid'],
     topic_id=result['topic_id'], comment_id=result['comment_id'], 
-    sentiment=result['sentiment'])
+    sentiment=result['sentiment'], 
+    topic_name=result['topic_name'], username=result['username'], 
+    vote_count=result['vote_count'], zipcode=zipcode)
     comments.append(Comment.toDict(comment))
   
   return jsonify(comments)
@@ -175,19 +183,39 @@ def profile():
 
 @app.route('/newcomment', methods=["POST"])
 def newcomment():
-  #form = request.form
-  
-  comment = "comment" #form['comment']
-  uid = 1 
-  topic_id = 1
-  comment_id = 110
-  sentiment = 1 #form['sentiment']
+  form = request.form
 
-  print(comment)
-  q = text("""INSERT INTO comments(comment, uid, topic_id, comment_id, sentiment)
-    VALUES(:comment, :uid, :topic_id, :comment_id, :sentiment)""")
+  comment = form['comment']
+  sentiment = form['sentiment']
+  topic_name = form['topic']
+  date_posted = datetime.now()
+  zipcode="97204"
+  comment_id = 123
+
+  if 'uid' in session:
+    current_user_uid = session['uid']
+    uid = current_user_uid
+  else:
+    print("not a user")
+  
+  # based on topic name finding topic id
+  topic_id = form['topic']
+  # topic_q = text("""
+  #     SELECT C.topic_id, T.topic_name
+  #     FROM Comments C, Topics T
+  #     WHERE T.topic_name LIKE '%:topic_name%'""")
+  # cursor = g.conn.execute(topic_q, topic_id=topic_id, topic_name=topic_name)
+  # for result in cursor:
+  #   print(result, '!!!')
+
+  # Inserting comment
+  q = text("""INSERT INTO comments(comment, uid, topic_id, comment_id, sentiment, zipcode,
+      date_posted)
+    VALUES(:comment, :uid, :topic_id, :comment_id, :sentiment, :zipcode, :date_posted)""")
+
+  print("query")
   g.conn.execute(q, comment=comment, uid=uid, topic_id=topic_id, 
-    comment_id=comment_id, sentiment=sentiment)
+    comment_id=comment_id, sentiment=sentiment, zipcode=zipcode, date_posted=date_posted)
 
   return redirect('/feed')
 

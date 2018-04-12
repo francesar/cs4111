@@ -28,30 +28,43 @@
       <div id="comments" class="col-sm-8">
         <!-- Writing a New Comment -->
         <div class="card border-secondary mb-3">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <h6> <b> New Comment </b></h6>
-              <div class="form">
-                <input type="text" id="text" placeholder="What is your comment?" class="form-control input">
-              </div>
-            </li>
-            <li class="list-group-item">
-              <p> Topic: </p>
-              <div class="form"> 
-                <select name="topics">
-                  <option valu"al">All</option>
-                  <option value="water">Water</option>
-                  <option value="elections">Elections</option>
-                  <option value="education">Education</option>
-                  <option value="health">Health</option>
-                  <option value="health">Other</option>
-                </select>
-              </div>
-            </li>
-            <li class="list-group-item">
-              <button class="btn btn-primary" style="align-content: center;" onclick="addComment()"> Submit Comment </button>
-            </li>
-          </ul>
+
+          <form id="new-comment-form" action="/newcomment" method="POST">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <h5>New Comment </h5>
+                <div class="form">
+                  <input name="comment" type="text" id="text" placeholder="What is your comment?" class="form-control input">
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="form-group">
+                  <label for="exampleFormControlSelect1">Topics:</label>
+                    <select name="topic" class="form-control-sm" id="new-topic">
+                      <option value="0"> - Choose One - </option>
+                      <option value="1">Water</option>
+                      <option value="2">Elections</option>
+                      <option value="3">Education</option>
+                      <option value="4">Health</option>
+                      <option value="5">Other</option>
+                    </select>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="form-group">
+                  <label for="exampleFormControlSelect1">Sentiment: </label>
+                    <select name="sentiment" class="form-control-sm" id="new-sentiment">
+                      <option> - Choose One - </option>
+                      <option value="0"> Good</option>
+                      <option value="1"> Bad</option>
+                    </select>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <button class="btn btn-primary" style="align-content: center;"> Submit Comment </button>
+              </li>
+            </ul>
+          </form>
         </div>
           <!-- Feed comes after this -->
       </div>
@@ -64,7 +77,7 @@
             </li>
             <li class="list-group-item">
               <h6> Zipcode: </h6>
-                <div class="form">
+                <div class="form-inline" >
                   <input type="text" id="zipcode" placeholder="Zipcode" class="form-control input">
                   <button class="btn btn-primary" onclick="updateFeedView()">View </button>
                 </div>
@@ -79,27 +92,25 @@
 
             <li class="list-group-item">
               <h6> Popularity: </h6>
-                <div class="form">
+                <!-- <div class="form"> -->
                   <div class="likeslider">
                     <input type="range" min="1" max="100" value="50" class="slider" id="slider">
                   <button class="btn btn-primary" onclick="updateFeedView()">View </button>
                   </div>
-                </div>
+                <!-- </div> -->
             </li>
 
             <li class="list-group-item">
-              <h6> Topics </h6>
-
-                <div class="form">
-                  <select name="topics">
-                    <option value="all">All</option>
-                    <option value="water">Water</option>
-                    <option value="elections">Elections</option>
-                    <option value="education">Education</option>
-                    <option value="health">Health</option>
-                    <option value="health">Other</option>
-                  </select>
-                  <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+                <div class="form-group">
+                  <label for="exampleFormControlSelect1">Topics:</label> <br>
+                    <select class="form-control-sm" id="topic-filter">
+                      <option value="1">Water</option>
+                      <option value="2">Elections</option>
+                      <option value="3">Education</option>
+                      <option value="4">Health</option>
+                      <option value="5">Other</option>
+                    </select>
+                  <button class="btn btn-primary" onclick="updateFeedView()">View</button>
                 </div>
             </li>
           </ul>
