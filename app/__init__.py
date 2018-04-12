@@ -1,4 +1,6 @@
 import os
+import random
+import uuid
 import pandas as pd
 import requests
 from sqlalchemy import *
@@ -100,6 +102,8 @@ def zipinfo():
 
 @app.route('/home')
 def home():
+  print('in home')
+  print(session)
   if 'uid' in session:
     print(session)
     return render_template('home.html')
@@ -219,24 +223,45 @@ def newcomment():
 
   return redirect('/feed')
 
-@app.route('/signup', methods=["POST"])
-def signup():
-  form = request.form
-  
-  name = form['name']
-  username = form['username']
-  password = form['password']
-  email = form['email']
-  address = form['address']
-  zipcode = form['zipcode']
-  phonenumber = form['phonenumber']
-  party = form['party']
+@app.route('/citizenSignUp', methods=["POST"])
+def citizenSignUp():
+  data = request.form
 
-  q = text("""INSERT INTO users(uid, name, username, password, email, zipcode, hid)
-    VALUES(:uid, :name, :username, :password, :email, :zipcode, :hid)""")
-  g.conn.execute(q, uid=12234, name=name, 
-    username=username, password=password, 
-    email=email, zipcode=60651, hid=1234456)
+  username = data['username']
+  password = data['password']
+  email = data['email']
+  name = data['name']
+  address = data['address']
+  zipcode = data['zipcode']
+  value = int(data['value'])
+  party = data['party']
+  uid = uuid.uuid4()
+  home_id = uuid.uuid4()
+
+  score = 10
+
+  g.conn.execute(text("""
+    INSERT INTO zipcodes (zipcode, avg_price)
+      SELECT :zipcode, :avg_price
+      WHERE :zipcode NOT IN (
+        SELECT z.zipcode FROM zipcodes z)
+    """), zipcode=zipcode, avg_price=value)
+
+  g.conn.execute(text("INSERT INTO homes VALUES (:hid, :score, :zipcode, :value)"), 
+    hid=home_id, score=10, zipcode=zipcode, value=value)
+
+  g.conn.execute(text("""
+    INSERT INTO users VALUES(:uid, :name, :username, 
+      :password, :email, :zipcode, :hid, :address, :party)
+    """), uid=uid, name=name, username=username, 
+    password=password, email=email, zipcode=zipcode, hid=home_id, 
+    address=address, party=party)
+
+  g.conn.execute(text("INSERT INTO citizens VALUES(:uid)"), uid=uid)
+
+  session['uid'] = uid
+  session['isRep'] = False
+  session['username'] = username
 
   return redirect('/home')
 
