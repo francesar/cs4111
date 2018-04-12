@@ -1,69 +1,73 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-      <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
-      <ul class="nav justify-content-end">
-        <li class="nav-item active">
-          <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="{{url_for('houseinfo')}}">Home Info</a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
-        </li>
-        <li>
-          <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
-        </li>
-      </ul>   
-    </nav>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
 
-    <div class="container">
-      <div class="jumbotron" style="margin-top:5%">
-        <h1 class="display-4">HomeRank</h1>
-        <p class="lead">Something something woooo</p>
-        <form action="/login" method="post">
-          {{ form.csrf_token }}
-          <div class="form-row">
-            <div class="form-group col">
-              <label>username</label>
-              <input class="form-control" type="text" placeholder="Enter username" name="username">
-            </div>
-            <div class="form-group col">
-              <label>password</label>
-              <input class="form-control" type="password" placeholder="Enter password" name="password">
-            </div>
-            <div class="form-group col">
-              <button class="btn btn-primary" type="submit">Login</button>
-            </div>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+    <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
+    <ul class="nav justify-content-end">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="{{url_for('houseinfo')}}">Home Info</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
+      </li>
+      <li>
+        <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+      </li>
+    </ul>
+  </nav>
+
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <ul class=flashes>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %} {% endwith %}
+
+  <div class="container">
+    <div class="jumbotron" style="margin-top:5%">
+      <h1 class="display-4">HomeRank</h1>
+      <p class="lead">Something something woooo</p>
+      <form action="/login" method="post">
+        {{ form.csrf_token }}
+        <div class="form-row">
+          <div class="form-group col">
+            <label>username</label>
+            <input class="form-control" type="text" placeholder="Enter username" name="username">
           </div>
-        </form>
-        <hr class="my-4"></hr>
-        <div class="bottom">
-          <h3>Don't have an account, sign up!</h3>
-          I am a 
-          <button class="btn btn-primary" onclick="toggleCitizenSignUp()">Citizen</button>
-          or
-          <button class="btn btn-primary">Representative</button>
-          <button type="button" id="b" class="btn btn-info btn-lg">Open Modal</button>
+          <div class="form-group col">
+            <label>password</label>
+            <input class="form-control" type="password" placeholder="Enter password" name="password">
+          </div>
+          <div class="form-group col">
+            <button class="btn btn-primary" type="submit">Login</button>
+          </div>
+        </div>
+      </form>
+      <hr class="my-4"></hr>
+      <div class="bottom">
+        <h3>Don't have an account, sign up!</h3>
+        I am a
+        <button class="btn btn-primary" onclick="toggleCitizenSignUp()">Citizen</button>
+        or
+        <button class="btn btn-primary" onclick="toggleRepresentativeSignUp()">Representative</button>
       </div>
     </div>
 
@@ -79,7 +83,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <form id="citizen-info" action="/citizenSignUp" method="POST">
+            <form id="a" action="/citizenSignUp" method="post">
               <div class="form-group">
                 <div class="row">
                   <div class="col">
@@ -91,11 +95,89 @@
                     <input type="text" class="form-control" name="email">
                   </div>
                   <div class="col">
-                      <label for="" class="col-form-label">Password</label>
-                      <input type="text" class="form-control" name="password">
+                    <label for="" class="col-form-label">Password</label>
+                    <input type="password" class="form-control" name="password">
                   </div>
                 </div>
                 <div class="row">
+                  <div class="col">
+                    <label for="" class="col-form-label">Legal Name</label>
+                    <input type="text" class="form-control" name="name">
+                  </div>
+                  <div class="col">
+                    <label for="" class="col-form-label">Home Address</label>
+                    <input type="text" class="form-control" name="address">
+                  </div>
+                  <div class="col">
+                    <label for="" class="col-form-label">Zipcode</label>
+                    <input type="text" class="form-control" name="zipcode">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <label class="col-form-label">Party Affiliation</label>
+                    <input type="text" class="form-control" name="party">
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Home Information and Score</h5>
+          </div>
+          <div class="modal-body">
+            <h6 class="modal-title">As part of the application, we ask users to self-report there homes dollar value.</h6>
+            <p class="modal-title">Using this information, we crowd source information to find out what the average home value is for your zipcode,
+              and compare it to other users in differnt zipcodes.</p>
+            <input class="form-control" placeholder="Value In USD" name="value">
+          </div>
+        </div>
+
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Zipcode Score</h5>
+          </div>
+          <div class="modal-body">
+            <p>Our algorithm computes a score based off of the senitment toward your neighborhood.</p>
+            <p>We book keep this sentiment score for your local representatives to see, and to help them make educated policy
+              decisions that will hopefully make you love your neighborhood more!</p>
+            <div>
+              <lable>Hello</lable>
+              <input name="ans1">
+            </div>
+          </div>
+          <button id="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model for Representative Login -->
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" id="representativeLoginForm">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Representative Sign up</h5>
+            <div class="modal-body">
+              <form action="/representativeSignUp" method="post">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col">
+                      <label for="citizen-name" class="col-form-label">Username</label>
+                      <input type="text" class="form-control" id="citizen-name" name="username">
+                    </div>
+                    <div class="col">
+                      <label for="citizen-name" class="col-form-label">Email</label>
+                      <input type="text" class="form-control" name="email">
+                    </div>
+                    <div class="col">
+                      <label for="" class="col-form-label">Password</label>
+                      <input type="password" class="form-control" name="password">
+                    </div>
+                  </div>
+                  <div class="row">
                     <div class="col">
                       <label for="" class="col-form-label">Legal Name</label>
                       <input type="text" class="form-control" name="name">
@@ -105,54 +187,34 @@
                       <input type="text" class="form-control" name="address">
                     </div>
                     <div class="col">
-                        <label for="" class="col-form-label">Zipcode</label>
-                        <input type="text" class="form-control" name="zipcode">
+                      <label for="" class="col-form-label">Zipcode</label>
+                      <input type="text" class="form-control" name="zipcode">
                     </div>
                   </div>
-                <div class="row">
-                  <div class="col">
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="democrat">
-                      <label class="form-check-label" for="inlineCheckbox1">Democrat</label>
+                  <div class="row">
+                    <div class="col">
+                      <label class="col-form-label">Party Affiliation</label>
+                      <input type="text" class="form-control" name="party">
                     </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="republican">
-                      <label class="form-check-label" for="inlineCheckbox2">Republican</label>
+                    <div class="col">
+                        <label class="col-form-label">Home Value</label>
+                        <input type="text" class="form-control" name="value">
+                      </div>
+                    <div class="col">
+                      <label class="col-form-label">Phone Number</label>
+                      <input type="text" class="form-control" name="phone-num">
                     </div>
                   </div>
                 </div>
-              </div>
-          </div>
-        </div>
-
-        <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">Home Information and Score</h5>
-          </div>
-          <div class="modal-body">
-            <h6 class="modal-title">As part of the application, we ask users to self-report there homes dollar value.</h6>
-            <p class="modal-title">Using this information, we crowd source information to find out what the average home value is for your zipcode, and compare it to other users in differnt zipcodes.</p>
-              <input class="form-control" placeholder="Value In USD" name="value">
-          </div>
-        </div>
-        
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Zipcode Score</h5>
-          </div>
-          <div class="modal-body">
-            <p>Our algorithm computes a score based off of the senitment toward your neighborhood.</p>
-            <p>We book keep this sentiment score for your local representatives to see, and to help them make educated policy decisions that will hopefully make you love your neighborhood more!</p>
-            <div>
-                <lable>Hello</lable>
-                <input name="ans1">
+                <button id="submit" class="btn btn-primary">Submit</button>
+              </form>
             </div>
           </div>
-          <button id ="submit" type="submit" class="btn btn-primary">Submit</button>
-        </form>
         </div>
       </div>
     </div>
+
     <script src="{{url_for('static', filename='index.js')}}"></script>
-  </body>
+</body>
+
 </html>

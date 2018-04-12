@@ -105,38 +105,38 @@ def home():
   print('in home')
   print(session)
   if 'uid' in session:
-    print(session)
+    print('in SESSIONS')
     return render_template('home.html')
   else:
+    print('redirecting back to root')
     return redirect('/')
 
 @app.route('/comments', methods=["POST"])
 def comments():
   req = request.get_json()
   zipcode = req['zipcode']
+  print(zipcode)
 
   comments_q = text("""
     SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
       C.sentiment, C.date_posted, T.topic_name, U.username, U.zipcode,
-      SUM(V.val) as vote_count
-    FROM Users U, Comments C, Topics T, Votes V
+      U.address
+    FROM Users U, Comments C, Topics T
     WHERE U.uid = C.uid 
       AND U.zipcode = :zipcode 
       AND T.tid = C.topic_id
-      AND V.comment_id = C.comment_id
     GROUP BY C.comment_id, C.comment, C.uid, C.topic_id, C.uid, C.sentiment, 
-      C.date_posted, T.topic_name, U.username, U.zipcode""")
+      C.date_posted, T.topic_name, U.username, U.zipcode, U.address""")
 
   cursor = g.conn.execute(comments_q, zipcode=zipcode)
   comments = []
 
   for result in cursor:
-    print(result, 'HELLO')
     comment = Comment(comment=result['comment'], uid=result['uid'],
     topic_id=result['topic_id'], comment_id=result['comment_id'], 
-    sentiment=result['sentiment'], date_posted=result['date_posted'], 
+    sentiment=result['sentiment'], 
     topic_name=result['topic_name'], username=result['username'], 
-    vote_count=result['vote_count'], zipcode=['zipcode'])
+    vote_count=1, zipcode=result['zipcode'], address=result['address'])
     comments.append(Comment.toDict(comment))
 
   print(comments)
@@ -352,9 +352,57 @@ def voting():
   print("VOTED")
   return redirect('/feed')
 
+
+@app.route('/representativeSignUp', methods=["POST"])
+def representativeSignUp():
+  data = request.form
+
+  username = data['username']
+  password = data['password']
+  email = data['email']
+  name = data['name']
+  address = data['address']
+  zipcode = data['zipcode']
+  party = data['party']
+  value = data['value']
+  phone_number = data['phone-num']
+  uid = uuid.uuid4()
+  home_id = uuid.uuid4()
+
+  g.conn.execute(text("""
+  INSERT INTO zipcodes (zipcode, avg_price)
+    SELECT :zipcode, 0
+    WHERE :zipcode NOT IN (
+      SELECT z.zipcode FROM zipcodes z)
+  """), zipcode=zipcode)
+
+  g.conn.execute(text("INSERT INTO homes VALUES (:hid, :score, :zipcode, :value)"), 
+  hid=home_id, score=10, zipcode=zipcode, value=value)
+
+  g.conn.execute(text("""
+  INSERT INTO users VALUES(:uid, :name, :username, 
+    :password, :email, :zipcode, :hid, :address, :party)
+  """), uid=uid, name=name, username=username, 
+  password=password, email=email, zipcode=zipcode, hid=home_id, 
+  address=address, party=party)
+
+  g.conn.execute(text("""
+    INSERT INTO representatives VALUES(:uid, :phone_number)
+  """), uid=uid, phone_number=phone_number)
+
+
+  session['uid'] = uid 
+  session['isRep'] = True
+  session['username'] = username
+
+  return redirect('/map')
+
 @app.route('/citizenSignUp', methods=["POST"])
 def citizenSignUp():
+
   data = request.form
+
+  print(data['username'])
 
   username = data['username']
   password = data['password']
@@ -366,6 +414,7 @@ def citizenSignUp():
   party = data['party']
   uid = uuid.uuid4()
   home_id = uuid.uuid4()
+  party = "Democrat"
 
   score = 10
 
@@ -376,8 +425,8 @@ def citizenSignUp():
         SELECT z.zipcode FROM zipcodes z)
     """), zipcode=zipcode, avg_price=value)
 
-  g.conn.execute(text("INSERT INTO homes VALUES (:hid, :score, :zipcode, :value)"), 
-    hid=home_id, score=10, zipcode=zipcode, value=value)
+  g.conn.execute(text("INSERT INTO homes VALUES (:hid, :score, :zipcode, :value)"),
+  hid=home_id, score=score, zipcode=zipcode, value=value)
 
   g.conn.execute(text("""
     INSERT INTO users VALUES(:uid, :name, :username, 
