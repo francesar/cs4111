@@ -1,4 +1,5 @@
 createFeedCommentHTML = c => {
+  console.log("creating comments")
   let comments = $('#comments');
 
   let card = $('<div class="card"></div>');
@@ -10,10 +11,12 @@ createFeedCommentHTML = c => {
   let cardTopic = $('<h6 class="card-topic"></h6>')
   let cardVotes = $('<h6 class="card-location"></h6>')
   let cardSentiment = $('<h6 class="card-location"></h6>')
-
+  let voting = $('<div class="input-group"><div class="input-group-append"><button class="btn btn-outline-secondary" type="button">Upvote</button><button class="btn btn-outline-secondary" type="button">Downvote</button></div></div>')
+  
   cardAuthor.text(c.username)
   cardLocation.text(c.zipcode)
   cardTimestamp.text(c.date_posted)
+  console.log(c.date_posted)
   cardText.text(" \"" + c.comment + "\" ")
   cardTopic.text("Topic: " + c.topic_name)
 
@@ -26,10 +29,10 @@ createFeedCommentHTML = c => {
   }
 
   if (c.vote_count > 0) {
-    cardVotes.text(c.vote_count + " upvotes")
+    cardVotes.text(c.vote_count + " votes")
     cardVotes.css({'color': 'green'})
-  } else if (c.vote_count > 0) {
-    cardVotes.text(c.vote_count + " downvotes")
+  } else if (c.vote_count < 0) {
+    cardVotes.text(c.vote_count + " votes")
     cardVotes.css({'color': 'red'})
   } else {
     cardVotes.text(c.vote_count + " votes")
@@ -42,6 +45,7 @@ createFeedCommentHTML = c => {
   cardBody = cardBody.append(cardText);
   cardBody = cardBody.append(cardTopic);
   cardBody = cardBody.append(cardVotes);
+  cardBody = cardBody.append(voting)
 
   card = card.append(cardBody);
 
@@ -49,10 +53,10 @@ createFeedCommentHTML = c => {
   comments.append(card);
 }
 
-updateFeedComments = (zipcode) => {
-  console.log("update feed comments " + zipcode)
+updateFeedComments = (filterType, filterQuery) => {
+  console.log("update filter comments to have " + filterQuery)
 
-  axios.post('/feedcomments', {zipcode})
+  axios.post('/feedcomments', {filterType, filterQuery})
     .then(resp => {
         resp.data.map(comment => {
         console.log("blah");
@@ -61,21 +65,12 @@ updateFeedComments = (zipcode) => {
     })
 }
 
-updateFeedView = () => {
-  const input = document.getElementById('zipcode')
-  const zipcode = input.value
-  console.log("update feed view " + zipcode)
+updateFeedView = (filter) => {
+  filterType = filter.id;
+  console.log(filterType)
+  const input = document.getElementById(filter.id);
+  const filterQuery = input.value;
+  console.log("update filter view: " + filterType);
+  updateFeedComments(filterType, filterQuery);
 
-  updateFeedComments(zipcode);
 }
-
-// addComment = () => {
-//   console.log("new comment")
-
-//   axios.post('/newcomment')
-  // .then(resp => {
-  //     resp.data.map(comment => {
-  //     console.log("posttt");
-  //   })
-  // })
-// }

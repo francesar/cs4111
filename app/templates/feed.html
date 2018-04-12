@@ -19,6 +19,9 @@
           <li class="nav-item active">
             <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
           </li>
+          <li>
+          <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+        </li>
         </ul>   
       </nav>
     </div>
@@ -79,38 +82,42 @@
               <h6> Zipcode: </h6>
                 <div class="form-inline" >
                   <input type="text" id="zipcode" placeholder="Zipcode" class="form-control input">
-                  <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+                  <button class="btn btn-primary" onclick="updateFeedView(zipcode)">View </button>
                 </div>
             </li>
             <li class="list-group-item">
               <h6> Date:  </h6>
               <div class="form">
-                <input type="date">
-                <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+                <input type="date" id="date_posted">
+                <button class="btn btn-primary" onclick="updateFeedView(date_posted)">View </button>
               </div>
             </li>
 
             <li class="list-group-item">
-              <h6> Popularity: </h6>
-                <!-- <div class="form"> -->
-                  <div class="likeslider">
-                    <input type="range" min="1" max="100" value="50" class="slider" id="slider">
-                  <button class="btn btn-primary" onclick="updateFeedView()">View </button>
-                  </div>
-                <!-- </div> -->
+              <h6> At Most X Votes: </h6>
+                <div class="form-inline" >
+                  <input type="text" id="maxvotes" placeholder="Maximum Votes" class="form-control input">
+                  <button class="btn btn-primary" onclick="updateFeedView(maxvotes)">View </button>
+                </div>
             </li>
-
+            <li class="list-group-item">
+              <h6> At Least X Votes: </h6>
+                <div class="form-inline" >
+                  <input type="text" id="minvotes" placeholder="Minimum Votes" class="form-control input">
+                  <button class="btn btn-primary" onclick="updateFeedView(minvotes)">View </button>
+                </div>
+            </li>
             <li class="list-group-item">
                 <div class="form-group">
                   <label for="exampleFormControlSelect1">Topics:</label> <br>
-                    <select class="form-control-sm" id="topic-filter">
+                    <select class="form-control-sm" id="topicfilter">
                       <option value="1">Water</option>
                       <option value="2">Elections</option>
                       <option value="3">Education</option>
                       <option value="4">Health</option>
                       <option value="5">Other</option>
                     </select>
-                  <button class="btn btn-primary" onclick="updateFeedView()">View</button>
+                  <button class="btn btn-primary" onclick="updateFeedView(topicfilter)">View</button>
                 </div>
             </li>
           </ul>

@@ -136,7 +136,7 @@ def comments():
     topic_id=result['topic_id'], comment_id=result['comment_id'], 
     sentiment=result['sentiment'], date_posted=result['date_posted'], 
     topic_name=result['topic_name'], username=result['username'], 
-    vote_count=result['vote_count'], zipcode=zipcode)
+    vote_count=result['vote_count'], zipcode=['zipcode'])
     comments.append(Comment.toDict(comment))
 
   print(comments)
@@ -146,40 +146,153 @@ def comments():
 @app.route('/feedcomments', methods=["POST"])
 def feedcomments():
   req = request.get_json()
-  zipcode = req['zipcode']
-  print(zipcode)
+  filterType = req['filterType']
+  filterQuery = req['filterQuery']
+  print(filterType)
 
-  og_query = text("""
-    SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
-      C.sentiment, C.date_posted, T.topic_name, U.username, U.zipcode,
-      SUM(V.val) as vote_count
-    FROM Users U, Comments C, Topics T, Votes V
-    WHERE U.uid = C.uid 
-      AND U.zipcode = :zipcode 
-      AND T.tid = C.topic_id
+  # Filter by Zipcode
+  if(filterType == 'zipcode'):
+    intzip = int(float(filterQuery))
+
+    og_query = text("""
+        SELECT C.comment, C.date_posted, C.sentiment, C.topic_id, 
+          T.topic_name, C.comment_id, U.uid, U.zipcode, 
+          U.username, SUM(V.val) as vote_count
+        FROM Users U, Comments C, Topics T, Votes V
+        WHERE U.uid = C.uid 
+          AND T.tid = C.topic_id
+          AND V.comment_id = C.comment_id
+          AND C.zipcode LIKE '%:zipcode%'
+        GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid""")
+
+    cursor = g.conn.execute(og_query, zipcode=intzip)
+    comments = []
+    for result in cursor:
+      print(result, '!!!')
+      comment = Comment(comment=result['comment'], uid=result['uid'],
+      topic_id=result['topic_id'], comment_id=result['comment_id'], 
+      sentiment=result['sentiment'], 
+      topic_name=result['topic_name'], username=result['username'], 
+      vote_count=result['vote_count'], zipcode=intzip)
+      comments.append(Comment.toDict(comment))
+    return jsonify(comments)
+
+  # Filter by Date
+  elif(filterType == 'date_posted'):
+    date_posted = filterQuery
+
+    og_query = text("""
+        SELECT C.comment, C.date_posted, C.sentiment, C.topic_id, 
+          T.topic_name, C.comment_id, U.uid, U.zipcode, 
+          U.username, SUM(V.val) as vote_count
+        FROM Users U, Comments C, Topics T, Votes V
+        WHERE U.uid = C.uid
+        AND V.comment_id = C.comment_id
+        AND C.topic_id = T.tid
+        AND CAST(C.date_posted AS DATE) = :date_posted
+        GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid""")
+
+    cursor = g.conn.execute(og_query, date_posted=date_posted)
+    comments = []
+    for result in cursor:
+      print(result, '!!!')
+      comment = Comment(comment=result['comment'], uid=result['uid'],
+      topic_id=result['topic_id'], comment_id=result['comment_id'], 
+      sentiment=result['sentiment'], 
+      topic_name=result['topic_name'], username=result['username'], 
+      vote_count=result['vote_count'], zipcode=['zipcode'])
+      comments.append(Comment.toDict(comment))
+    return jsonify(comments)
+
+  # Filter by Max Votes 
+  elif(filterType == 'maxvotes'):
+    maxvotes = int(float(filterQuery))
+
+    og_query = text("""
+      SELECT C.comment,  V.val, C.comment_id, C.date_posted, C.sentiment, C.topic_id, T.topic_name, U.uid, U.zipcode, U.username, SUM(V.val) as vote_count
+      FROM Users U, Comments C, Topics T, Votes V
+      WHERE U.uid = C.uid
       AND V.comment_id = C.comment_id
-    GROUP BY C.comment_id, C.comment, C.uid, C.topic_id, C.uid, C.sentiment, 
-      C.date_posted, T.topic_name, U.username, U.zipcode""")
+      AND C.topic_id = T.tid
+      AND V.val <= :maxvotes
+      GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid, V.val""")
 
-  cursor = g.conn.execute(og_query, zipcode=zipcode)
-  comments = []
-  for result in cursor:
-    print(result, '!!!')
-    comment = Comment(comment=result['comment'], uid=result['uid'],
-    topic_id=result['topic_id'], comment_id=result['comment_id'], 
-    sentiment=result['sentiment'], 
-    topic_name=result['topic_name'], username=result['username'], 
-    vote_count=result['vote_count'], zipcode=zipcode)
-    comments.append(Comment.toDict(comment))
+    cursor = g.conn.execute(og_query, maxvotes=maxvotes)
+    comments = []
+    for result in cursor:
+      print(result, '!!!')
+      comment = Comment(comment=result['comment'], uid=result['uid'],
+      topic_id=result['topic_id'], comment_id=result['comment_id'], 
+      sentiment=result['sentiment'], 
+      topic_name=result['topic_name'], username=result['username'], 
+      vote_count=result['vote_count'], zipcode=['zipcode'])
+      comments.append(Comment.toDict(comment))
+    return jsonify(comments)
+
+  # Filter by Min Votes 
+  elif(filterType == 'minvotes'):
+    minvotes = int(float(filterQuery))
+
+    og_query = text("""
+      SELECT C.comment,  V.val, C.comment_id, C.date_posted, C.sentiment, C.topic_id, T.topic_name, U.uid, U.zipcode, U.username, SUM(V.val) as vote_count
+      FROM Users U, Comments C, Topics T, Votes V
+      WHERE U.uid = C.uid
+      AND V.comment_id = C.comment_id
+      AND C.topic_id = T.tid
+      AND V.val >= :minvotes
+      GROUP BY C.comment_id, C.topic_id, T.topic_name, U.username, U.zipcode, U.uid, V.val""")
+
+    cursor = g.conn.execute(og_query, minvotes=minvotes)
+    comments = []
+    for result in cursor:
+      print(result, '!!!')
+      comment = Comment(comment=result['comment'], uid=result['uid'],
+      topic_id=result['topic_id'], comment_id=result['comment_id'], 
+      sentiment=result['sentiment'], 
+      topic_name=result['topic_name'], username=result['username'], 
+      vote_count=result['vote_count'], zipcode=['zipcode'])
+      comments.append(Comment.toDict(comment))
+    return jsonify(comments)
+
+  # Filter by Topic 
+  elif(filterType == 'topicfilter'):
+    inttid = int(float(filterQuery))
+
+    og_query = text("""
+        SELECT C.comment, C.date_posted, C.sentiment, C.topic_id, 
+          T.topic_name, C.comment_id, U.uid, U.zipcode, 
+          U.username, SUM(V.val) as vote_count
+        FROM Users U, Comments C, Topics T, Votes V
+        WHERE U.uid = C.uid 
+        AND V.comment_id = C.comment_id
+        AND C.topic_id LIKE '%:topicfilterid%'
+        AND C.topic_id = T.tid
+        GROUP BY C.comment_id, T.topic_name, U.username, U.zipcode, 
+          U.uid, C.topic_id""")
+
+    cursor = g.conn.execute(og_query, topicfilterid=inttid)
+    comments = []
+    for result in cursor:
+      print(result, '!!!')
+      comment = Comment(comment=result['comment'], uid=result['uid'],
+      topic_id=result['topic_id'], comment_id=result['comment_id'], 
+      sentiment=result['sentiment'], 
+      topic_name=result['topic_name'], username=result['username'], 
+      vote_count=result['vote_count'], zipcode=['zipcode'])
+      comments.append(Comment.toDict(comment))
+    return jsonify(comments)
+
+  else:
+    print("yikes")
   
-  return jsonify(comments)
+  return redirect('/feed')
 
 @app.route('/profile')
 def profile():
   cursor = g.conn.execute("SELECT * FROM users U")
   row = cursor.first()
-  user = Citizen(username=row.username, uid=row.uid, name=row.name,
-        email=row.email, zipcode=row.zipcode, hid=row.hid)
+  user = Citizen(uid=row.uid, name=row.name, username=row.username, email=row.email, zipcode=row.zipcode, 
+        hid=row.hid, address=row.address, party_affiliation=row.party_affiliation)
   cursor.close()
 
   print(user.name)
@@ -193,24 +306,18 @@ def newcomment():
   sentiment = form['sentiment']
   topic_name = form['topic']
   date_posted = datetime.now()
-  zipcode="97204"
-  comment_id = 123
+  comment_id = uuid.uuid4()
 
   if 'uid' in session:
     current_user_uid = session['uid']
+    #current_user_zipcode = session['zipcode']
     uid = current_user_uid
+    zipcode = "10027" #current_user_zipcode
   else:
     print("not a user")
   
-  # based on topic name finding topic id
+
   topic_id = form['topic']
-  # topic_q = text("""
-  #     SELECT C.topic_id, T.topic_name
-  #     FROM Comments C, Topics T
-  #     WHERE T.topic_name LIKE '%:topic_name%'""")
-  # cursor = g.conn.execute(topic_q, topic_id=topic_id, topic_name=topic_name)
-  # for result in cursor:
-  #   print(result, '!!!')
 
   # Inserting comment
   q = text("""INSERT INTO comments(comment, uid, topic_id, comment_id, sentiment, zipcode,
@@ -277,12 +384,12 @@ def login():
 
     row = cursor.first()
     if row:
-      user = Citizen(username=row.username, uid=row.uid, name=row.name,
-      email=row.email, zipcode=row.zipcode, hid=row.hid)
+      user = Citizen(uid=row.uid, name=row.name, username=row.username, email=row.email, zipcode=row.zipcode, 
+        hid=row.hid, address=row.address, party_affiliation=row.party_affiliation)
 
       session['username'] = user.username
       session['uid'] = user.uid
-      return redirect('/home')
+      return redirect('/feed')
     else:
       flash('Username or password incorrect')
       return redirect('/')
