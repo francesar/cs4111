@@ -1,131 +1,137 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{url_for('static', filename='feed.css')}}">
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  </head>
-  <body>
-    <div>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-        <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
-        <ul class="nav justify-content-end">
-          <li class="nav-item active">
-            <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="{{url_for('home')}}">Home Info</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
-          </li>
-          <li>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="{{url_for('static', filename='feed.css')}}">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+      <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
+      <ul class="nav justify-content-end">
+        <li class="nav-item active">
+          <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{url_for('home')}}">Home Info</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
+        </li>
+        <li>
           <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
         </li>
-        </ul>   
-      </nav>
-    </div>
+      </ul>
+    </nav>
+  </div>
 
-    <h2 style="text-align: center; padding-top: 10px;">Feed</h2>
-    <div class="row">          
-      <div id="comments" class="col-sm-8">
-        <!-- Writing a New Comment -->
-        <div class="card border-secondary mb-3">
+  <h2 style="text-align: center; padding-top: 10px;">Feed</h2>
+  <div class="row">
+    <div id="comments" class="col-sm-8">
+      <!-- Writing a New Comment -->
+      <div class="card border-secondary mb-3">
 
-          <form id="new-comment-form" action="/newcomment" method="POST">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">
-                <h5>New Comment </h5>
-                <div class="form">
-                  <input name="comment" type="text" id="text" placeholder="What is your comment?" class="form-control input">
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="form-group">
-                  <label for="exampleFormControlSelect1">Topics:</label>
-                    <select name="topic" class="form-control-sm" id="new-topic">
-                      <option value="0"> - Choose One - </option>
-                      <option value="1">Water</option>
-                      <option value="2">Elections</option>
-                      <option value="3">Education</option>
-                      <option value="4">Health</option>
-                      <option value="5">Other</option>
-                    </select>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <div class="form-group">
-                  <label for="exampleFormControlSelect1">Sentiment: </label>
-                    <select name="sentiment" class="form-control-sm" id="new-sentiment">
-                      <option> - Choose One - </option>
-                      <option value="0"> Good</option>
-                      <option value="1"> Bad</option>
-                    </select>
-                </div>
-              </li>
-              <li class="list-group-item">
-                <button class="btn btn-primary" style="align-content: center;"> Submit Comment </button>
-              </li>
-            </ul>
-          </form>
-        </div>
-          <!-- Feed comes after this -->
-      </div>
-
-      <div id="filtering" class="col-sm-4" style="padding-right: 35px;">
-        <div class="card text-center border-secondary mb-3">
+        <form id="new-comment-form" action="/newcomment" method="POST">
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <h5>Filter By: </h5>
-            </li>
-            <li class="list-group-item">
-              <h6> Zipcode: </h6>
-                <div class="form-inline" >
-                  <input type="text" id="zipcode" placeholder="Zipcode" class="form-control input">
-                  <button class="btn btn-primary" onclick="updateFeedView(zipcode)">View </button>
-                </div>
-            </li>
-            <li class="list-group-item">
-              <h6> Date:  </h6>
+              <h5>New Comment </h5>
               <div class="form">
-                <input type="date" id="date_posted">
-                <button class="btn btn-primary" onclick="updateFeedView(date_posted)">View </button>
+                <input name="comment" type="text" id="text" placeholder="What is your comment?" class="form-control input">
               </div>
             </li>
-
             <li class="list-group-item">
-              <h6> At Most X Votes: </h6>
-                <div class="form-inline" >
-                  <input type="text" id="maxvotes" placeholder="Maximum Votes" class="form-control input">
-                  <button class="btn btn-primary" onclick="updateFeedView(maxvotes)">View </button>
-                </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Topics:</label>
+                <select name="topic" class="form-control-sm" id="new-topic">
+                  <option value="0"> - Choose One - </option>
+                  <option value="1">Water</option>
+                  <option value="2">Elections</option>
+                  <option value="3">Education</option>
+                  <option value="4">Health</option>
+                  <option value="5">Other</option>
+                </select>
+              </div>
             </li>
             <li class="list-group-item">
-              <h6> At Least X Votes: </h6>
-                <div class="form-inline" >
-                  <input type="text" id="minvotes" placeholder="Minimum Votes" class="form-control input">
-                  <button class="btn btn-primary" onclick="updateFeedView(minvotes)">View </button>
-                </div>
+              <div class="form-group">
+                <label for="exampleFormControlSelect1">Sentiment: </label>
+                <select name="sentiment" class="form-control-sm" id="new-sentiment">
+                  <option> - Choose One - </option>
+                  <option value="0"> Good</option>
+                  <option value="1"> Bad</option>
+                </select>
+              </div>
             </li>
             <li class="list-group-item">
-                <div class="form-group">
-                  <label for="exampleFormControlSelect1">Topics:</label> <br>
-                    <select class="form-control-sm" id="topicfilter">
-                      <option value="1">Water</option>
-                      <option value="2">Elections</option>
-                      <option value="3">Education</option>
-                      <option value="4">Health</option>
-                      <option value="5">Other</option>
-                    </select>
-                  <button class="btn btn-primary" onclick="updateFeedView(topicfilter)">View</button>
-                </div>
+              <button class="btn btn-primary" style="align-content: center;"> Submit Comment </button>
             </li>
           </ul>
-        </div>
+        </form>
       </div>
-    <script src="{{url_for('static', filename='feed.js')}}"> 
-    </script>
+      <!-- Feed comes after this -->
     </div>
 
-  </body>
+    <div id="filtering" class="col-sm-4" style="padding-right: 35px;">
+      <div class="card text-center border-secondary mb-3">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <h5>Filter By: </h5>
+          </li>
+          <li class="list-group-item">
+            <h6> Zipcode: </h6>
+            <div class="form-inline">
+              <input type="text" id="zipcode" placeholder="Zipcode" class="form-control input">
+              <button class="btn btn-primary" onclick="updateFeedView(zipcode)">View </button>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <h6> Date: </h6>
+            <div class="form">
+              <input type="date" id="date_posted">
+              <button class="btn btn-primary" onclick="updateFeedView(date_posted)">View </button>
+            </div>
+          </li>
+
+          <li class="list-group-item">
+            <h6> At Most X Votes: </h6>
+            <div class="form-inline">
+              <input type="text" id="maxvotes" placeholder="Maximum Votes" class="form-control input">
+              <button class="btn btn-primary" onclick="updateFeedView(maxvotes)">View </button>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <h6> At Least X Votes: </h6>
+            <div class="form-inline">
+              <input type="text" id="minvotes" placeholder="Minimum Votes" class="form-control input">
+              <button class="btn btn-primary" onclick="updateFeedView(minvotes)">View </button>
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="form-group">
+              <label for="exampleFormControlSelect1">Topics:</label>
+              <br>
+              <select class="form-control-sm" id="topicfilter">
+                <option value="1">Water</option>
+                <option value="2">Elections</option>
+                <option value="3">Education</option>
+                <option value="4">Health</option>
+                <option value="5">Other</option>
+              </select>
+              <button class="btn btn-primary" onclick="updateFeedView(topicfilter)">View</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script src="{{url_for('static', filename='feed.js')}}">
+    </script>
+  </div>
+
+</body>
+
 </html>

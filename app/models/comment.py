@@ -3,7 +3,7 @@ class Comment():
     topic_id, comment_id, 
     sentiment, topic_name, 
     username, vote_count,
-    zipcode):
+    zipcode, date_posted, address="Dont Worry About It"):
     self.comment = comment
     self.uid = uid
     self.topic_id = topic_id
@@ -13,6 +13,8 @@ class Comment():
     self.username = username
     self.vote_count = vote_count
     self.zipcode = zipcode
+    self.date_posted = date_posted
+    self.address = address
     
   @staticmethod
   def toDict(self):
@@ -25,5 +27,7 @@ class Comment():
       'topic_name': self.topic_name,
       'username': self.username,
       'vote_count': self.vote_count,
-      'zipcode': self.zipcode
+      'zipcode': self.zipcode,
+      'date_posted': self.date_posted,
+      'address': self.address
     }

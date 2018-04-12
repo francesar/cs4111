@@ -56,7 +56,6 @@ updateComments = (zipcode) => {
   axios.post('/comments', {zipcode})
     .then(resp => {
       resp.data.map(comment => {
-        console.log(comment);
         createCommentHTML(comment);
         addMarkerToMap(comment);
       })
@@ -73,7 +72,7 @@ getLatLng = (zipcode, cb) => {
 }
 
 addMarkerToMap = c => {
-  getLatLng(c.zipcode, function(res) {
+  getLatLng(c.address, function(res) {
     const {lat, lng} = res;
     let marker = new google.maps.Marker({
       position: {lat: lat, lng:lng},
