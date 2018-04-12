@@ -134,7 +134,7 @@ def comments():
   for result in cursor:
     comment = Comment(comment=result['comment'], uid=result['uid'],
     topic_id=result['topic_id'], comment_id=result['comment_id'], 
-    sentiment=result['sentiment'], date_posted=result['date_posted'], 
+    sentiment=result['sentiment'], 
     topic_name=result['topic_name'], username=result['username'], 
     vote_count=1, zipcode=result['zipcode'], address=result['address'])
     comments.append(Comment.toDict(comment))
