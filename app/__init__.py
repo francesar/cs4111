@@ -1,4 +1,6 @@
 import os
+import pandas as pd
+import requests
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -19,8 +21,6 @@ login_manager = LoginManager()
 
 DATABASEURI = "postgresql://cfi2103:6814@35.227.79.146/proj1part2"
 engine = create_engine(DATABASEURI)
-
-cache = {}
 
 @app.before_request
 def before_request():
@@ -43,9 +43,59 @@ def teardown_request(exception):
 def index():
   return render_template("index.html", form=LoginForm())
 
+@app.route('/u/<uid>')
+def user(uid):
+  return 'user'
+
 @app.route('/map')
 def map():
   return render_template("map.html")
+
+@app.route('/houseinfo')
+def houseinfo():
+  if 'uid' in session:
+    current_user_uid = session['uid']
+
+    city_q = text("""
+      SELECT U.zipcode, Z.city_name, Z.avg_price, H.score, H.value
+      FROM Users U, Zipcodes Z, Homes H
+      WHERE U.uid = :uid AND Z.zipcode = U.zipcode AND U.hid = H.hid""")
+    
+    cursor = g.conn.execute(city_q, uid=current_user_uid)
+    home_info = {}
+    for result in cursor:
+      home_info['zipcode'] = result['zipcode']
+      home_info['city'] = result['city_name']
+      home_info['price'] = result['avg_price']
+      home_info['score'] = result['score']
+      home_info['value'] = result['value']
+       
+    return render_template('homeinfo.html', **home_info)
+  else:
+    return redirect('/')
+
+@app.route('/zipinfo', methods=["POST"])
+def zipinfo():
+  req = request.get_json()
+  zipcode = req['zipcode']
+
+  print(zipcode)
+
+  query = text("""
+    SELECT Z.avg_price, AVG(H.score) as score
+    FROM Zipcodes Z NATURAL JOIN Homes H
+    WHERE Z.zipcode = :zipcode
+    GROUP BY Z.avg_price""")
+  zipcode_info = {}
+  cursor = g.conn.execute(query, zipcode=zipcode)
+  for result in cursor:
+    zipcode_info['price'] = result['avg_price']
+    zipcode_info['score'] = int(result['score'])
+
+  print(zipcode_info)
+  
+  return jsonify(zipcode_info)
+
 
 @app.route('/home')
 def home():
@@ -60,16 +110,31 @@ def comments():
   req = request.get_json()
   zipcode = req['zipcode']
 
-  print(zipcode)
+  comments_q = text("""
+    SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
+      C.sentiment, T.topic_name, U.username, U.zipcode,
+      SUM(V.val) as vote_count
+    FROM Users U, Comments C, Topics T, Votes V
+    WHERE U.uid = C.uid 
+      AND U.zipcode = :zipcode 
+      AND T.tid = C.topic_id
+      AND V.comment_id = C.comment_id
+    GROUP BY C.comment_id, C.comment, C.uid, C.topic_id, C.uid, C.sentiment, 
+      T.topic_name, U.username, U.zipcode""")
 
-  query = text("SELECT * FROM Comments")
-  cursor = g.conn.execute(query)
+  cursor = g.conn.execute(comments_q, zipcode=zipcode)
   comments = []
+
   for result in cursor:
+    print(result, 'HELLO')
     comment = Comment(comment=result['comment'], uid=result['uid'],
     topic_id=result['topic_id'], comment_id=result['comment_id'], 
-    sentiment=result['sentiment'])
+    sentiment=result['sentiment'], topic_name=result['topic_name'], 
+    username=result['username'], vote_count=result['vote_count'],
+    zipcode=zipcode)
     comments.append(Comment.toDict(comment))
+
+  print(comments)
   
   return jsonify(comments)
 
@@ -125,6 +190,11 @@ def login():
       errs.append("{}: {}".format(error[1][0], error[0]))
     flash(errs)
     return redirect('/')
+
+@app.route('/logout')
+def logout():
+  session.clear()
+  return redirect('/')
 
 @app.route('/feed')
 def feed():

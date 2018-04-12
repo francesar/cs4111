@@ -1,22 +1,30 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <ul class="nav justify-content-end">
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Profile</a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Home Info</a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="#">Feed</a>
-        </li>
-      </ul>   
-    </nav>
+        <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
+        <ul class="nav justify-content-end">
+          <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('houseinfo')}}">Home Info</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
+          </li>
+          <li>
+            <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
+          </li>
+        </ul>   
+      </nav>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -29,7 +37,7 @@
     {% endwith %}
 
     <div class="container">
-      <div class="jumbotron">
+      <div class="jumbotron" style="margin-top:5%">
         <h1 class="display-4">HomeRank</h1>
         <p class="lead">Something something woooo</p>
         <form action="/login" method="post">
@@ -49,8 +57,36 @@
           </div>
         </form>
         <hr class="my-4"></hr>
-        <button class="btn btn-primary">Sign Up</button>
+        <div class="bottom">
+          <h3>Don't have an account, sign up!</h3>
+          I am a 
+          <button class="btn btn-primary">Citizen</button>
+          or
+          <button class="btn btn-primary">Representative</button>
+          <button type="button" class="btn btn-info btn-lg" data-target="#myModal" onclick="toggleModel()">Open Modal</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
+
+  </div>
+</div>
+      </div>
+    </div>
+    <script src="{{url_for('static', filename='index.js')}}"></script>
   </body>
 </html>

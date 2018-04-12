@@ -14,10 +14,13 @@
           <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
         </li>
         <li class="nav-item active">
-          <a class="nav-link" href="{{url_for('home')}}">Home Info</a>
+          <a class="nav-link" href="{{url_for('houseinfo')}}">Home Info</a>
         </li>
         <li class="nav-item active">
           <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
+        </li>
+        <li>
+          <a class="nav-link" href="{{url_for('logout')}}">Logout</a>
         </li>
       </ul>   
     </nav>
@@ -34,6 +37,16 @@
         </div>
         <div id="comments">
           
+        </div>
+        <div class="list-group">
+          <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Topic</h5>
+              <small>8/17/18</small>
+            </div>
+            <p class="mb-1">My water is not safe to drink.</p>
+            <small>Bad</small>
+          </a>
         </div>
       </div>
     </div>

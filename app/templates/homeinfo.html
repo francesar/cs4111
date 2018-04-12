@@ -1,6 +1,9 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static', filename='homeinfo.css')}}"/>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{{url_for('static', filename='homeinfo.js')}}"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
@@ -21,9 +24,22 @@
       </ul>   
     </nav>
     <div class="container">
+      <div class="row content">
+        <div class="column">
+          <h3>Your home price and score</h3>
+          <h5>Price: {{value}}</h5>
+          <h5>Score: {{score}}</h5>
+        </div>
+        <div class="column">
+          <h2>Compare your price and score with user reported data</h2>
+          <input class="form-group form-control" placeholder="Change Zip" id="changezip">
+          <button class="btn btn-primary" onclick="changezip()">Change</button>
+          <h3 id="zipcode">For Zipcode: {{zipcode}}</h3>
+          <h3 id="price">Avg Home price: {{price}}</h3>
+          <h5 id="score">Avg Score: {{score}}</h5>
+        </div>
+      </div>
     </div>
-    <h1>HomeRank</h1>
-    <h3>Profile</h3>
 
   </body>
 </html>

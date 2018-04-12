@@ -6,6 +6,8 @@ CREATE TABLE Users (
     email VARCHAR(60),
     zipcode VARCHAR(5) NOT NULL,
     hid INTEGER NOT NULL,
+    address TEXT,
+    party_affiliation TEXT,
     FOREIGN KEY(zipcode) REFERENCES Zipcodes,
     FOREIGN KEY(hid) REFERENCES Home,
     PRIMARY KEY(uid),
@@ -37,8 +39,8 @@ CREATE TABLE Zipcodes (
     zipcode VARCHAR(5),
     county TEXT,
     city_name TEXT,
-    avg_zillow_price INTEGER,
-    CONSTRAINT valid_home_price CHECK(avg_zillow_price > 0),
+    avg_price INTEGER DEFAULT 0,
+    CONSTRAINT valid_home_price CHECK(avg_price >= 0),
     CONSTRAINT valid_zip_length CHECK(char_length(zipcode) = 5),
     PRIMARY KEY(zipcode)
     CHECK (char_length(zipcode) == 5)
@@ -57,7 +59,10 @@ CREATE TABLE Comments (
     topic_id INTEGER NOT NULL,
     comment_id INTEGER NOT NULL,
     sentiment INTEGER NOT NULL,
+    zipcode VARCHAR(5) NOT NULL,
+    date_posted TIMESTAMP DEFAULT current_timestamp,
     FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
+    FOREIGN KEY(zipcode) REFERENCES Zipcodes,
     FOREIGN KEY(topic_id) REFERENCES Topics ON DELETE CASCADE,
     PRIMARY KEY(comment_id)
 );
