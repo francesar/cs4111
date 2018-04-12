@@ -109,7 +109,6 @@ def home():
 def comments():
   req = request.get_json()
   zipcode = req['zipcode']
-<<<<<<< HEAD
 
   comments_q = text("""
     SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
@@ -124,12 +123,6 @@ def comments():
       T.topic_name, U.username, U.zipcode""")
 
   cursor = g.conn.execute(comments_q, zipcode=zipcode)
-=======
-  print(zipcode)
-
-  query = text("SELECT * FROM Comments")
-  cursor = g.conn.execute(query)
->>>>>>> 1eee4ec3aab026d8e30abf23c4ae25cc57363f70
   comments = []
 
   for result in cursor:
