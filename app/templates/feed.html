@@ -1,28 +1,113 @@
 <html>
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static', filename='feed.css')}}">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <span class="navbar-text">
-        <ul class="navbar-nav">
+    <div>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+        <a class="navbar-brand" href="{{url_for('index')}}">HomeRank</a>
+        <ul class="nav justify-content-end">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home</a>
-            <a class="nav-link" href="#">Home Info</a>
-            <a class="nav-link" href="#">Feed</a>
+            <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('home')}}">Home Info</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{url_for('feed')}}">Feed</a>
           </li>
         </ul>   
-      </span>
-    </nav>
-    <div class="container">
+      </nav>
     </div>
-    <h1>HomeRank</h1>
-    <h3>Feed</h3>
 
+    <h2 style="text-align: center; padding-top: 10px;">Feed</h2>
+    <div class="row">          
+      <div id="comments" class="col-sm-8">
+        <!-- Writing a New Comment -->
+        <div class="card border-secondary mb-3">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <h6> <b> New Comment </b></h6>
+              <div class="form">
+                <input type="text" id="text" placeholder="What is your comment?" class="form-control input">
+              </div>
+            </li>
+            <li class="list-group-item">
+              <p> Topic: </p>
+              <div class="form"> 
+                <select name="topics">
+                  <option valu"al">All</option>
+                  <option value="water">Water</option>
+                  <option value="elections">Elections</option>
+                  <option value="education">Education</option>
+                  <option value="health">Health</option>
+                  <option value="health">Other</option>
+                </select>
+              </div>
+            </li>
+            <li class="list-group-item">
+              <button class="btn btn-primary" style="align-content: center;" onclick="addComment()"> Submit Comment </button>
+            </li>
+          </ul>
+        </div>
+          <!-- Feed comes after this -->
+      </div>
+
+      <div id="filtering" class="col-sm-4" style="padding-right: 35px;">
+        <div class="card text-center border-secondary mb-3">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <h5>Filter By: </h5>
+            </li>
+            <li class="list-group-item">
+              <h6> Zipcode: </h6>
+                <div class="form">
+                  <input type="text" id="zipcode" placeholder="Zipcode" class="form-control input">
+                  <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+              <h6> Date:  </h6>
+              <div class="form">
+                <input type="date">
+                <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+              </div>
+            </li>
+
+            <li class="list-group-item">
+              <h6> Popularity: </h6>
+                <div class="form">
+                  <div class="likeslider">
+                    <input type="range" min="1" max="100" value="50" class="slider" id="slider">
+                  <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+                  </div>
+                </div>
+            </li>
+
+            <li class="list-group-item">
+              <h6> Topics </h6>
+
+                <div class="form">
+                  <select name="topics">
+                    <option value="all">All</option>
+                    <option value="water">Water</option>
+                    <option value="elections">Elections</option>
+                    <option value="education">Education</option>
+                    <option value="health">Health</option>
+                    <option value="health">Other</option>
+                  </select>
+                  <button class="btn btn-primary" onclick="updateFeedView()">View </button>
+                </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    <script src="{{url_for('static', filename='feed.js')}}"> 
+    </script>
     </div>
+
   </body>
 </html>

@@ -109,6 +109,7 @@ def home():
 def comments():
   req = request.get_json()
   zipcode = req['zipcode']
+<<<<<<< HEAD
 
   comments_q = text("""
     SELECT C.comment, C.comment_id, C.uid, C.topic_id, 
@@ -123,6 +124,12 @@ def comments():
       T.topic_name, U.username, U.zipcode""")
 
   cursor = g.conn.execute(comments_q, zipcode=zipcode)
+=======
+  print(zipcode)
+
+  query = text("SELECT * FROM Comments")
+  cursor = g.conn.execute(query)
+>>>>>>> 1eee4ec3aab026d8e30abf23c4ae25cc57363f70
   comments = []
 
   for result in cursor:
@@ -138,9 +145,51 @@ def comments():
   
   return jsonify(comments)
 
+@app.route('/feedcomments', methods=["POST"])
+def feedcomments():
+  req = request.get_json()
+  zipcode = req['zipcode']
+  print(zipcode)
+
+  query = text("SELECT * FROM Comments")
+  cursor = g.conn.execute(query)
+  comments = []
+  for result in cursor:
+    comment = Comment(comment=result['comment'], uid=result['uid'], 
+    topic_id=result['topic_id'], comment_id=result['comment_id'], 
+    sentiment=result['sentiment'])
+    comments.append(Comment.toDict(comment))
+  
+  return jsonify(comments)
+
 @app.route('/profile')
 def profile():
-  return 'profile'
+  cursor = g.conn.execute("SELECT * FROM users U")
+  row = cursor.first()
+  user = Citizen(username=row.username, uid=row.uid, name=row.name,
+        email=row.email, zipcode=row.zipcode, hid=row.hid)
+  cursor.close()
+
+  print(user.name)
+  return render_template("profile.html", user=user)
+
+@app.route('/newcomment', methods=["POST"])
+def newcomment():
+  #form = request.form
+  
+  comment = "comment" #form['comment']
+  uid = 1 
+  topic_id = 1
+  comment_id = 110
+  sentiment = 1 #form['sentiment']
+
+  print(comment)
+  q = text("""INSERT INTO comments(comment, uid, topic_id, comment_id, sentiment)
+    VALUES(:comment, :uid, :topic_id, :comment_id, :sentiment)""")
+  g.conn.execute(q, comment=comment, uid=uid, topic_id=topic_id, 
+    comment_id=comment_id, sentiment=sentiment)
+
+  return redirect('/feed')
 
 @app.route('/signup', methods=["POST"])
 def signup():
@@ -198,10 +247,6 @@ def logout():
 
 @app.route('/feed')
 def feed():
-  cursor = g.conn.execute("SELECT * FROM comments")
-  for result in cursor:
-    print(result)  # can also be accessed using result[0]
-  cursor.close()
   return render_template("feed.html")
 
 if __name__ == "__main__":

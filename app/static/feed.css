@@ -1,0 +1,45 @@
+/*#feed {
+    height: 100%;
+}*/
+
+#filtering {
+    height: 100%;
+}
+
+.card:first-child {
+    margin-top: 10px;
+}
+
+.card {
+    margin-bottom: 20px;
+    margin-left: 15px;
+}
+.card-timestamp{
+    float: right;
+}
+
+.row {
+    height: 100%;
+}
+
+.form {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.input {
+    margin-right: 15px;
+}
+
+.left {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: scroll;
+}
+
+.comments {
+
+}
