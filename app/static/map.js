@@ -55,8 +55,10 @@ createCommentHTML = c => {
 updateComments = (zipcode) => {
   axios.post('/comments', {zipcode})
     .then(resp => {
+      commentsByUser = {}
       resp.data.map(comment => {
         createCommentHTML(comment);
+        commentsByUser[comment.username] = comment
         addMarkerToMap(comment);
       })
     })

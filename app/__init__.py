@@ -44,7 +44,12 @@ def teardown_request(exception):
 
 @app.route('/')
 def index():
-  return render_template("index.html", form=LoginForm())
+  if 'uid' in session:
+    print(session['uid'])
+    return redirect('/feed')
+  else:
+    return render_template("index.html", form=LoginForm())
+
 
 @app.route('/u/<uid>')
 def user(uid):
@@ -299,14 +304,25 @@ def feedcomments():
 
 @app.route('/profile')
 def profile():
-  cursor = g.conn.execute("SELECT * FROM users U")
+  cursor = g.conn.execute(text("SELECT * FROM users U WHERE U.uid = :uid"), uid=session['uid'])
   row = cursor.first()
   user = Citizen(uid=row.uid, name=row.name, username=row.username, email=row.email, zipcode=row.zipcode, 
         hid=row.hid, address=row.address, party_affiliation=row.party_affiliation)
   cursor.close()
+  
+  reps = []
+  cursor = g.conn.execute(text("""
+    select * 
+    from users U, representatives R
+    where R.uid = U.uid and U.zipcode = :zipcode"""), zipcode=user.zipcode)
+  for row in cursor:
+    r = Representative(uid=row.uid, name=row.name, username=row.username, email=row.email, zipcode=row.zipcode, 
+        hid=row.hid, address=row.address, party_affiliation=row.party_affiliation, phone_number=row.phone_number)
+    reps.append(r)
 
-  print(user.name)
-  return render_template("profile.html", user=user)
+  print(reps)
+
+  return render_template("profile.html", user=user, reps=reps)
 
 @app.route('/newcomment', methods=["POST"])
 def newcomment():
@@ -319,12 +335,11 @@ def newcomment():
   comment_id = uuid.uuid4()
   vote_id = uuid.uuid4()
 
-  print(session)
   if 'uid' in session:
     current_user_uid = session['uid']
     uid = current_user_uid
-    print("UID")
-    print(uid)
+
+    uid = str(uid)
 
     zq = text("""SELECT U.zipcode FROM Users U WHERE U.uid = :uid;""")
     zcursor = g.conn.execute(zq, uid=uid)
@@ -454,7 +469,7 @@ def citizenSignUp():
   session['isRep'] = False
   session['username'] = username
 
-  return redirect('/home')
+  return redirect('/feed')
 
 @app.route('/login', methods=["POST"])
 def login():
@@ -491,7 +506,10 @@ def logout():
 
 @app.route('/feed')
 def feed():
-  return render_template("feed.html")
+  if 'uid' in session:
+    return render_template("feed.html")
+  else:
+    return redirect('/')
 
 if __name__ == "__main__":
   import click

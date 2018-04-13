@@ -49,6 +49,31 @@
         </div>
       </div>
     </div>
+    <h2 style="text-align:center;padding-top:10px;">Your Reps info</h2>
+    {% for rep in reps %}
+      <div class="row">
+        <div class="col-md">
+          <div class="card border-secondary" style="margin-left: 25px;">
+            <div class="card-body">
+              <h4 class="card-title" style="text-align: center;">{{rep.name}}</h4>
+              <p class="card-text text-center"> {{rep.name}}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <b> username: </b> {{rep.username}} </li>
+              <li class="list-group-item">
+                <b> email: </b> {{rep.email}} </li>
+              <li class="list-group-item">
+                <b> Address: </b> {{rep.address}} </li>
+              <li class="list-group-item">
+                <b> Party Affiliation: </b> {{rep.party_affiliation}} </li>
+              <li class="list-group-item">
+                <b> Party Affiliation: </b> {{rep.phone_number}} </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
   </div>
 
 </body>
