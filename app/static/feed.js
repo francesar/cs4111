@@ -11,7 +11,8 @@ createFeedCommentHTML = c => {
   let cardTopic = $('<h6 class="card-topic"></h6>')
   let cardVotes = $('<h6 class="card-location"></h6>')
   let cardSentiment = $('<h6 class="card-location"></h6>')
-  let voting = $('<form id="voting" action="/voting" method="POST"><div class="input-group"><div class="input-group-append"><button id="up" class="btn btn-outline-secondary" type="button" style="color:green;">Agree</button><button class="btn btn-outline-secondary" id="down" type="button" style="color:red;">Disagree</button></div></div></form>')
+  let voting = 
+    $('<form id="voting"><div class="input-group"><div class="input-group-append"><button id="up" class="btn btn-outline-secondary" style="color:green;" onclick="updateUpVote()">Agree</button><button class="btn btn-outline-secondary" id="down" style="color:red;" onclick="updateDownVote()">Disagree</button></div></div></form>')
   
   cardAuthor.text(c.username)
   cardLocation.text(c.zipcode)
@@ -59,18 +60,21 @@ updateFeedComments = (filterType, filterQuery) => {
   axios.post('/feedcomments', {filterType, filterQuery})
     .then(resp => {
         resp.data.map(comment => {
-        console.log("blah");
-        createFeedCommentHTML(comment);
-      })
+          console.log("blah");
+          createFeedCommentHTML(comment);
+        })
     })
+    // .then(resp => {
+    //     axios.post('/feed')
+    // })
 }
 
-createFeedHeaderHTML = (filterType, filterQuery) => {
-  console.log("creating header");
-  let body = $('<div></div>');
-  let header = $('<h3></h3>');
-  header.text("Comments relating to... " + filterType + " of " + filterQuery);
-}
+// createFeedHeaderHTML = (filterType, filterQuery) => {
+//   console.log("creating header");
+//   let body = $('<div></div>');
+//   let header = $('<h3></h3>');
+//   header.text("Comments relating to... " + filterType + " of " + filterQuery);
+// }
 
 updateFeedView = (filter) => {
   filterType = filter.id;
@@ -79,4 +83,14 @@ updateFeedView = (filter) => {
 
   createFeedHeaderHTML(filterType, filterQuery);
   updateFeedComments(filterType, filterQuery);
+}
+
+updateUpVote = () => {
+  type = 'up'
+  axios.post('/vote', {type})
+}
+
+updateDownVote = () => {
+  type = 'down'
+  axios.post('/vote', {type})
 }
