@@ -190,6 +190,7 @@ def feedcomments():
       topic_name=result['topic_name'], username=result['username'], 
       vote_count=result['vote_count'], zipcode=result['zipcode'])
       comments.append(Comment.toDict(comment))
+    print(comments)
     return jsonify(comments)
 
   # Filter by Date
@@ -373,18 +374,18 @@ def newcomment():
 @app.route('/vote', methods=["POST"])
 def vote():
   print("VOTE")
-  req = request.get_json()
-  vote = req['type']
+  form = request.form
+  comment_id = form['comment']
+  vote = form['up']
 
-  print(vote)
-
-  print(req)
+  print(comment_id)
+  
   if(vote == 'up'):
     voting = text("""UPDATE Votes SET val = val + 1 WHERE comment_id = :comment_id""")
-    g.conn.execute(vq, comment_id=comment_id) 
-  else if(vote == 'down'):
+    g.conn.execute(voting, comment_id=comment_id) 
+  elif(vote == 'down'):
     voting = text("""UPDATE Votes SET val = val - 1 WHERE comment_id = :comment_id""")
-    g.conn.execute(vq, comment_id=comment_id)
+    g.conn.execute(voting, comment_id=comment_id)
   else:
     print("something's wrong")
 

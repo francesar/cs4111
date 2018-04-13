@@ -11,13 +11,10 @@ createFeedCommentHTML = c => {
   let cardTopic = $('<h6 class="card-topic"></h6>')
   let cardVotes = $('<h6 class="card-location"></h6>')
   let cardSentiment = $('<h6 class="card-location"></h6>')
-  let voting = 
-    $('<form id="voting"><div class="input-group"><div class="input-group-append"><button id="up" class="btn btn-outline-secondary" style="color:green;" onclick="updateUpVote()">Agree</button><button class="btn btn-outline-secondary" id="down" style="color:red;" onclick="updateDownVote()">Disagree</button></div></div></form>')
-  
+
   cardAuthor.text(c.username)
   cardLocation.text(c.zipcode)
   cardTimestamp.text(c.date_posted)
-  console.log(c.date_posted)
   cardText.text(" \"" + c.comment + "\" ")
   cardTopic.text("Topic: " + c.topic_name)
 
@@ -29,6 +26,29 @@ createFeedCommentHTML = c => {
     cardSentiment.css({'color': 'green'})
   }
 
+  let cid = String(c.comment_id)
+  console.log(cid)
+  // let voting = 
+  //   $(`<div class="input-group"><div class="input-group-append"><button class="btn btn-outline-secondary" style="color:green;" data-id=${cid} onclick="updateUpVote(event)">Agree</button><button class="btn btn-outline-secondary" style="color:red;">Disagree</button></div></div>`)
+  let upVoting = 
+    $(`<form action="/vote" method="post">
+        <div class="form-group">
+          <input type="hidden" name="comment" value=${cid}>
+          <input type="hidden" name="up" value="up">
+        </div>
+        <button class="btn btn-primary">Agree?</button>
+      </form>`)
+  
+  let downVoting = 
+    $(`<form action="/vote" method="post">
+        <div class="form-group">
+          <input type="hidden" name="comment" value=${cid}>
+          <input type="hidden" name="up" value="down">
+        </div>
+        <button class="btn btn-primary">Disagree?</button>
+      </form>`)
+  
+
   if (c.vote_count > 0) {
     cardVotes.text(c.vote_count + " votes")
     cardVotes.css({'color': 'green'})
@@ -38,7 +58,6 @@ createFeedCommentHTML = c => {
   } else {
     cardVotes.text(c.vote_count + " votes")
   }
-  console.log(c.name)
 
   cardBody = cardBody.append(cardAuthor);
   cardBody = cardBody.append(cardLocation);
@@ -46,7 +65,8 @@ createFeedCommentHTML = c => {
   cardBody = cardBody.append(cardText);
   cardBody = cardBody.append(cardTopic);
   cardBody = cardBody.append(cardVotes);
-  cardBody = cardBody.append(voting)
+  cardBody = cardBody.append(upVoting)
+  cardBody = cardBody.append(downVoting)
 
   card = card.append(cardBody);
 
@@ -80,17 +100,22 @@ updateFeedView = (filter) => {
   filterType = filter.id;
   const input = document.getElementById(filter.id);
   const filterQuery = input.value;
-
-  createFeedHeaderHTML(filterType, filterQuery);
   updateFeedComments(filterType, filterQuery);
 }
 
-updateUpVote = () => {
-  type = 'up'
-  axios.post('/vote', {type})
+
+// $(document).ready(function() {
+// $('#up').on('click', function(e) {
+//   console.log(e);  
+//   e.preventDefault();
+// })
+// });
+
+updateUpVote = (e) => {
+  axios.post('/vote', {comment_id: e.currentTarget});
 }
 
-updateDownVote = () => {
+updateDownVote = (e) => {
   type = 'down'
   axios.post('/vote', {type})
 }
