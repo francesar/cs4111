@@ -306,7 +306,7 @@ def feedcomments():
 
 @app.route('/profile')
 def profile():
-  cursor = g.conn.execute(text("SELECT * FROM users U WHERE U.uid = :uid"), uid=session['uid'])
+  cursor = g.conn.execute(text("SELECT * FROM users U WHERE U.uid = :uid"), uid=str(session['uid']))
   row = cursor.first()
   user = Citizen(uid=row.uid, name=row.name, username=row.username, email=row.email, zipcode=row.zipcode, 
         hid=row.hid, address=row.address, party_affiliation=row.party_affiliation)
