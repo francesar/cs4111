@@ -10,10 +10,44 @@ SQL Account:
 
 URL: http://35.190.176.72:7000/
 
-We successfully completed every part of the original application, except that we chose to work with user submitted data instead of data from zillow. In terms of extra
-functionality, we chose to show a map for representatives, so that they can view comments. 
+3 Expanded Features 
 
-The Feed page includes a bulk of the our database operations, where users can create, view, and filter out different comments that other users have made.
-Here we used JOINS, WHERE, and UPDATE clauses that allow for complex interactions with our database objects. 
+1. Added TEXT attribute to Representative_Comments table (body attribute). This was added because apart from having comments about specific zipcodes, 
+it is also important to give citizens the option to provide their opinions on the different representatives that work within their 
+zipcode. This allows us to be able to extract information on a more granular level, since before we only had overall sentiment for a 
+specific zipcode, which almost always is representated by different people.
 
-The map page was also interesting since it was the page where we had to interact with our database objects using front end javascript.
+2. Defined parse_body trigger. When inserting into the Representative_Comments table, we defined this trigger to automatically tokenize and populate 
+the Tokens attribute of that table. Using the tokens, we set ourselves up to easily do more advanced natural language processing work based off of 
+people's tokenized comments. The trigger itself runs before an insert or after an update, in each case, there is a possibility that a new/updated comment
+is being inputed into the database, so we found it important that the token attribute of that table be updated to reflect the new value for the comment.
+The trigger also checks to see whether or not the body field was populated before tokenizing the body. 
+
+3.
+
+Example Queries 
+
+1. Gives us all comments that contain the word 'bad' in them
+
+SELECT body 
+FROM representative_comments 
+WHERE to_tsvector(body) @@ to_tsquery('bad')
+
+
+2. Trigger Definition 
+
+    CREATE FUNCTION parse_body() RETURNS trigger AS $parse_body$
+        BEGIN
+            IF NEW.body IS NULL THEN
+                RAISE EXCEPTION 'comment body cannot be null';
+            END IF;
+            NEW.tokens := to_tsvector(NEW.body);
+            RETURN NEW;
+        END;
+    $parse_body$ LANGUAGE plpgsql;
+
+
+    CREATE TRIGGER parse_body BEFORE INSERT OR UPDATE ON representative_comments
+    FOR EACH ROW EXECUTE PROCEDURE parse_body();
+
+3. 
