@@ -88,6 +88,10 @@ CREATE TABLE Representative_Comments (
     PRIMARY KEY(document_id)
 );
 
+/* adding column that contains the names of reps for a zipcode into an array */ 
+ALTER TABLE zipcodes
+ADD All_Reps text[]; 
+
 -- Trigger Definition
 -- CREATE FUNCTION parse_body() RETURNS trigger AS $parse_body$
 --     BEGIN
