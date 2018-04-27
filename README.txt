@@ -31,7 +31,7 @@ Example Queries
 
 SELECT body 
 FROM representative_comments 
-WHERE to_tsvector(body) @@ to_tsquery('bad')
+WHERE tokens @@ to_tsquery('bad')
 
 
 2. Trigger Definition 
