@@ -76,3 +76,31 @@ CREATE TABLE Votes (
     FOREIGN KEY(uid) REFERENCES Users,
     PRIMARY KEY(vote_id)
 );
+
+CREATE TABLE Representative_Comments (
+    body TEXT,
+    tokens TSVECTOR,
+    cid TEXT NOT NULL,
+    rid TEXT NOT NULL,
+    document_id TEXT, 
+    FOREIGN KEY(cid) REFERENCES Users,
+    FOREIGN KEY(rid) REFERENCES Users,
+    PRIMARY KEY(document_id)
+);
+
+-- Trigger Definition
+-- CREATE FUNCTION parse_body() RETURNS trigger AS $parse_body$
+--     BEGIN
+--         IF NEW.body IS NULL THEN
+--             RAISE EXCEPTION 'comment body cannot be null';
+--         END IF;
+
+--         -- Remember who changed the payroll when
+--         NEW.tokens := to_tsvector(NEW.body);
+--         RETURN NEW;
+--     END;
+-- $parse_body$ LANGUAGE plpgsql;
+
+
+-- CREATE TRIGGER parse_body BEFORE INSERT OR UPDATE ON representative_comments
+-- FOR EACH ROW EXECUTE PROCEDURE parse_body();
